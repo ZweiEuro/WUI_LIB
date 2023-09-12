@@ -1,0 +1,5 @@
+build/
+docs/A1_GameConcept
+.vscode
+CEF/
+!*/*.gitkeep
