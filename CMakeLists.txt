@@ -1,63 +1,168 @@
-#
-# Global setup.
-#
-
-# For VS2019 and Xcode 12+ support.
-cmake_minimum_required(VERSION 3.19)
-
-# Only generate Debug and Release configuration types.
-set(CMAKE_CONFIGURATION_TYPES Debug Release)
-
-# Project name.
-project(WebUI)
-
-# Use folders in the resulting project files.
-set_property(GLOBAL PROPERTY OS_FOLDERS ON)
-
-# Example 3: The binary distribution is in a separate directory from your
-#            project. Locate the binary distribution using the CEF_ROOT
-#            environment variable.
-# A. Create a directory structure for your project like the following:
-#    myproject/
-#      CMakeLists.txt    <= top-level CMake configuration
-#      cmake/
-#        FindCEF.cmake   <= CEF CMake configuration entry point
-#      mytarget/
-#        CMakeLists.txt  <= CMake configuration for `mytarget`
-#        ... other `mytarget` source files
-# B. Copy this file to "myproject/CMakeLists.txt" as the top-level CMake
-#    configuration.
-# C. Copy the cmake/FindCEF.cmake file to "myproject/cmake/FindCEF.cmake".
-# D. Create the target-specific "myproject/mytarget/CMakeLists.txt" file for
-#    your application. See the included cefclient and cefsimple CMakeLists.txt
-#    files as an example.
-# E. Set the CEF_ROOT environment variable before executing CMake. For example:
-#    > set CEF_ROOT=c:\path\to\cef_binary_3.2704.xxxx.gyyyyyyy_windows32
-# F. Comment in these lines:
-
-set(CEF_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/CEF")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+cmake_minimum_required(VERSION 3.10)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-#
-# Load the CEF configuration.
-#
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# Execute FindCEF.cmake which must exist in CMAKE_MODULE_PATH.
-find_package(CEF REQUIRED)
+project(wui)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cef_cmake.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/get_cef_version.cmake)
+
+if(NOT CEF_CMAKE_INCLUDED)
+    message(FATAL_ERROR "CEF-CMake: Configuration not included. You need to include `cef_cmake` in your root CMakeLists.txt file")
+endif()
+
+# Note: Anything other than the version here is NOT supported officially, if you wanne build it, you're on your own
+#options
+set(WUI_CEF_VERSION "116.0.21+g9c7dc32+chromium-116.0.5845.181" CACHE STRING "CEF version to use")
+set(WUI_OUTPUT "${CMAKE_BINARY_DIR}/bin" CACHE STRING "Output directory for the generated files, used for the required shared libs; ignored on MSVC" )
+
+# donwload/unpack CEF binary if not present for version and platform
+get_cef_version(${WUI_CEF_VERSION} cefName)
+
+if(MSVC)
+    set(CEF_CMAKE_OUTPUT_DIR ${CEF_CMAKE_OUTPUT_DIR}/$<CONFIG>)
+endif()
 
 
-#
-# Define CEF-based targets.
-#
-
-# Include the libcef_dll_wrapper target.
-# Comes from the libcef_dll/CMakeLists.txt file in the binary distribution
-# directory.
-add_subdirectory(${CEF_LIBCEF_DLL_WRAPPER_PATH} libcef_dll_wrapper)
-add_subdirectory(wui_lib)
-
-# Display configuration settings.
-PRINT_CEF_CONFIG()
 
 
+set(libcef_src_files)
+set(libcef_src_dir ${cefName}/libcef_dll)
+file(GLOB_RECURSE libcef_src_files "${libcef_src_dir}/*.cc" "${libcef_src_dir}/*.mm" "${libcef_src_dir}/*.h" "${cefName}/include/*.h")
+
+add_library(cefdll_wrapper_lib STATIC ${libcef_src_files})
+
+target_compile_definitions(cefdll_wrapper_lib
+    PRIVATE
+        # Creating the CEF wrapper library. Do not define this for dependent targets.
+        -DWRAPPING_CEF_SHARED
+    PUBLIC
+        # Allow C++ programs to use stdint.h macros specified in the C99 standard that aren't
+        # in the C++ standard (e.g. UINT8_MAX, INT64_MIN, etc)
+        -D__STDC_CONSTANT_MACROS
+        -D__STDC_FORMAT_MACROS
+)
+
+target_include_directories(cefdll_wrapper_lib
+    PUBLIC ${cefName}
+    INTERFACE include
+)
+
+# add_custom_command(TARGET cefdll_wrapper_lib POST_BUILD
+#     COMMENT "cefdll_wrapper: Copying CEF resources"
+#     COMMAND ${CMAKE_COMMAND} -E
+#         make_directory ${CEF_CMAKE_OUTPUT_DIR}
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory
+#         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/locales
+#         ${CEF_CMAKE_OUTPUT_DIR}/locales
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/cef.pak
+#         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/cef_100_percent.pak
+#         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/cef_200_percent.pak
+#         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/cef_extensions.pak
+#         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/devtools_resources.pak
+#         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/icudtl.dat
+#         ${CEF_CMAKE_OUTPUT_DIR}
+# )
+
+
+
+if(CEF_CMAKE_OS_LINUX)
+    target_link_libraries(cefdll_wrapper_lib INTERFACE
+        X11
+        pthread
+        debug ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Debug/libcef.so
+        optimized ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Release/libcef.so
+    )
+
+    # add_custom_target(cefdll_wrapper_lib POST_BUILD
+    #     COMMENT "cefdll_wrapper: Copying CEF binaries"
+    #     COMMAND ${CMAKE_COMMAND} -E
+    #         make_directory ${CEF_CMAKE_OUTPUT_DIR}
+    #     COMMAND ${CMAKE_COMMAND} -E copy_directory
+    #         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/swiftshader
+    #         ${CEF_CMAKE_OUTPUT_DIR}/swiftshader
+    #     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    #         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/chrome-sandbox
+    #         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libcef.so
+    #         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libEGL.so
+    #         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libGLESv2.so
+    #         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/natives_blob.bin
+    #         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/snapshot_blob.bin
+    #         ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/v8_context_snapshot.bin
+    #         ${CEF_CMAKE_OUTPUT_DIR}
+    # )
+
+
+    if(CEF_USE_SANDBOX)
+        target_compile_definitions(cefdll_wrapper_lib
+            PUBLIC -DCEF_USE_SANDBOX
+        )
+    endif()
+
+elseif(CEF_CMAKE_OS_WINDOWS)
+
+    target_compile_definitions(cefdll_wrapper_lib PUBLIC
+        -DNOMINMAX
+        -DWIN32_LEAN_AND_MEAN
+        -DUNICODE
+        -D_UNICODE
+    )
+
+    target_link_libraries(cefdll_wrapper_lib PUBLIC
+        comctl32.lib
+        rpcrt4.lib
+        shlwapi.lib
+        ws2_32.lib
+        debug ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Debug/libcef.lib
+        optimized ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Release/libcef.lib
+    )
+
+    add_custom_command(TARGET cefdll_wrapper_lib POST_BUILD
+        COMMENT "cefdll_wrapper: Copying CEF binaries"
+        COMMAND ${CMAKE_COMMAND} -E
+            make_directory ${CEF_CMAKE_OUTPUT_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/swiftshader
+            ${CEF_CMAKE_OUTPUT_DIR}/swiftshader
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/chrome_elf.dll
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/d3dcompiler_47.dll
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libcef.dll
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libEGL.dll
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libGLESv2.dll
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/natives_blob.bin
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/snapshot_blob.bin
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/v8_context_snapshot.bin
+            ${CEF_CMAKE_OUTPUT_DIR}
+    )
+
+    if(CEF_USE_SANDBOX)
+        target_compile_definitions(cefdll_wrapper_lib
+            PUBLIC
+                -DCEF_USE_SANDBOX
+                -DPSAPI_VERSION=1
+        )
+
+        target_link_libraries(cefdll_wrapper_lib PUBLIC
+            dbghelp.lib
+            psapi.lib
+            version.lib
+            wbemuuid.lib
+            winmm.lib
+            debug ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Debug/cef_sandbox.lib
+            optimized ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Release/cef_sandbox.lib
+        )
+    endif()
+
+else()
+    # TODO: Copy macos shared libraries
+    message(FATAL_ERROR "CEF-CMake: Build platform not supported yet")
+endif()
+
+
+add_subdirectory(wui)

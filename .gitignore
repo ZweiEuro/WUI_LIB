@@ -3,3 +3,4 @@ docs/A1_GameConcept
 .vscode
 CEF/
 !*/*.gitkeep
+cef_binary_*
