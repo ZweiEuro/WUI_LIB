@@ -12,9 +12,9 @@ add_library(${PROJECT_NAME}
 add_subdirectory(libs)
 
 #header files 
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PRIVATE include includePublic)
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    cefdll_wrapper_lib
+    cefdll_wrapper
 )

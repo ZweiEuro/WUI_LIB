@@ -11,7 +11,7 @@ function(get_cef_version ARG_VERSION ret)
     elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
         set(CEF_CMAKE_OS_WINDOWS 1)
     else()
-        message(FATAL_ERROR "CEF-CMake: Unsupported target platform")
+        message(FATAL_ERROR "Unsupported target platform")
     endif()
 
     # set name extensions based on platform
@@ -28,14 +28,14 @@ function(get_cef_version ARG_VERSION ret)
             set(cefName cef_binary_${ARG_VERSION}_windows32)
         endif()
     else()
-        message(FATAL_ERROR "CEF-CMake: Download platform not supported yet")
+        message(FATAL_ERROR "Download platform not supported yet")
     endif()
 
     set(${ret} ${cefName} PARENT_SCOPE)
 
     # Does the folder already exist?
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${cefName})
-        message(STATUS "CEF-CMake: Using existing CEF ${cefName}")
+        message(STATUS "Using existing CEF ${cefName}")
         set(${ARG_VERSION} ${cefName} PARENT_SCOPE)
         return()
     endif()
@@ -49,13 +49,13 @@ function(get_cef_version ARG_VERSION ret)
 
     if(NOT EXISTS ${cefArchive})
         # download cef version
-        message(STATUS "CEF-CMake: Downloading CEF ${cefArchiveURL}")
+        message(STATUS "Downloading CEF ${cefArchiveURL}")
         file(DOWNLOAD ${cefArchiveURL} ${cefArchive}
             SHOW_PROGRESS
         )
 
         # ... and extract
-        message(STATUS "CEF-CMake: Extracting ${cefArchive}")
+        message(STATUS "Extracting ${cefArchive}")
         execute_process(
             COMMAND ${CMAKE_COMMAND} -E tar xzf ${cefArchive}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

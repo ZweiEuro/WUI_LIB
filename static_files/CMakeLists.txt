@@ -1,0 +1,5 @@
+#final Cmake file for the finished build
+
+target_link_directories(${PROJECT_NAME} PUBLIC .)
+target_link_libraries(${PROJECT_NAME} PUBLIC wui cefdll_wrapper cef EGL GLESv2 vk_swiftshader vulkan)
+target_include_directories(${PROJECT_NAME} PRIVATE include)
