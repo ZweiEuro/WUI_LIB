@@ -3,7 +3,7 @@ set(srcs)
 #source files
 file(GLOB_RECURSE srcs src/*.cpp)
 
-add_executable(${PROJECT_NAME}
+add_library(${PROJECT_NAME}
     ${srcs}
     ${CEF_CMAKE_EXECUTABLE_RESOURCES}
 )

@@ -77,7 +77,10 @@ if(CEF_CMAKE_OS_LINUX)
         pthread
         debug ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Debug/libcef.so
         optimized ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Release/libcef.so
+        
     )
+    
+    
 
     # add_custom_target(cefdll_wrapper_lib POST_BUILD
     #     COMMENT "cefdll_wrapper: Copying CEF binaries"
