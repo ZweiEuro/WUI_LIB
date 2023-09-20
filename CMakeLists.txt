@@ -76,9 +76,13 @@ target_include_directories(cefdll_wrapper
 
 
 if(CEF_CMAKE_OS_LINUX)
+
+    find_package(X11 REQUIRED)
+    find_package(Threads REQUIRED)
+
     target_link_libraries(cefdll_wrapper INTERFACE
         X11
-        pthread
+        Threads::Threads
         debug ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Debug/libcef.so
         optimized ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Release/libcef.so
     )
@@ -94,14 +98,15 @@ if(CEF_CMAKE_OS_LINUX)
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/chrome-sandbox
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libcef.so
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libEGL.so
-            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libGLESv2.so
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libvk_swiftshader.so
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libvulkan.so.1
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/snapshot_blob.bin
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/v8_context_snapshot.bin
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/vk_swiftshader_icd.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/static_files/CMakeLists.txt
             ${CEF_OUTPUT_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_CURRENT_SOURCE_DIR}/static_files/CMakeLists.X11.txt
+            ${CEF_OUTPUT_DIR}/CMakeLists.txt
     )
 
 
