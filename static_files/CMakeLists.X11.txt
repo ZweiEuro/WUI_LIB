@@ -3,3 +3,14 @@
 target_link_directories(${PROJECT_NAME} PUBLIC .)
 target_link_libraries(${PROJECT_NAME} PUBLIC wui cefdll_wrapper cef EGL vk_swiftshader vulkan)
 target_include_directories(${PROJECT_NAME} PRIVATE include)
+
+
+#Helper function to copy html files for the ui over to the exe
+function(cef_copy_ui_files path)
+    file(GLOB_RECURSE files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${path}/*")
+    foreach(file ${files})
+        if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${file}")
+            configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}/${file}" COPYONLY)
+        endif()
+    endforeach()
+endfunction()

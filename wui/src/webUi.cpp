@@ -1,10 +1,14 @@
-#include <include/cef_client.h>
-#include <include/cef_app.h>
 
-#include <pthread.h>
+#include "webUi.hpp"
+#include "RendererHandler.hpp"
+#include "BrowserClient.hpp"
 
 namespace wui
 {
+
+    CefRefPtr<wui::RendererHandler> rendererHandler;
+    CefRefPtr<wui::BrowserClient> browserClient;
+    CefRefPtr<CefBrowser> browser;
 
     bool initCEF(int argc, char **argv)
     {
@@ -55,4 +59,30 @@ namespace wui
         return init_res;
     }
 
+    bool startWui(void **pixelBuffer, const size_t initialHeight, const size_t initialWidth, std::string path)
+    {
+        if (rendererHandler.get() != nullptr)
+        {
+            DLOG(ERROR) << "Web UI already started";
+            return false;
+        }
+
+        CefWindowInfo window_info;
+        window_info.SetAsWindowless(0); // false means no transparency (site background colour)
+
+        rendererHandler = new wui::RendererHandler(pixelBuffer, initialHeight, initialWidth);
+        browserClient = new wui::BrowserClient(rendererHandler);
+
+        CefBrowserSettings browserSettings;
+        browserSettings.windowless_frame_rate = 60; // 30 is default
+
+        browser = CefBrowserHost::CreateBrowserSync(window_info, browserClient.get(), path, browserSettings, nullptr, nullptr);
+
+        return true;
+    }
+
+    bool resizeUi(const size_t newHeight, const size_t newWidth, void **pixelbuffer)
+    {
+        return false;
+    }
 }
