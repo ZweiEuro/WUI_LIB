@@ -3,6 +3,8 @@
 #include "RendererHandler.hpp"
 #include "BrowserClient.hpp"
 
+#include <filesystem>
+
 namespace wui
 {
 
@@ -10,7 +12,7 @@ namespace wui
     CefRefPtr<wui::BrowserClient> browserClient;
     CefRefPtr<CefBrowser> browser;
 
-    bool initCEF(int argc, char **argv)
+    bool CEFInit(int argc, char **argv)
     {
         CefMainArgs args(argc, argv);
 
@@ -61,6 +63,8 @@ namespace wui
 
     bool startWui(void **pixelBuffer, const size_t initialHeight, const size_t initialWidth, std::string path)
     {
+        DLOG(INFO) << "Starting Web UI";
+
         if (rendererHandler.get() != nullptr)
         {
             DLOG(ERROR) << "Web UI already started";
@@ -70,15 +74,48 @@ namespace wui
         CefWindowInfo window_info;
         window_info.SetAsWindowless(0); // false means no transparency (site background colour)
 
+        DLOG(INFO) << "Renderer Init";
         rendererHandler = new wui::RendererHandler(pixelBuffer, initialHeight, initialWidth);
+
+        DLOG(INFO) << "Browser Init";
         browserClient = new wui::BrowserClient(rendererHandler);
 
         CefBrowserSettings browserSettings;
         browserSettings.windowless_frame_rate = 60; // 30 is default
 
-        browser = CefBrowserHost::CreateBrowserSync(window_info, browserClient.get(), path, browserSettings, nullptr, nullptr);
+        // If path does not start with '/', it is relative to the current working directory.
+        if (path.front() != '/')
+        {
+            path = std::filesystem::current_path().string() + "/" + path;
+        }
+
+        // if path does not end with '/', add it
+        if (path.back() != '/')
+        {
+            path += "/";
+        }
+
+        path += "index.html";
+
+        DLOG(INFO)
+            << "Open File: " << path
+            << " in Browser, with URL: "
+            << "file://" + path;
+
+        browser = CefBrowserHost::CreateBrowserSync(window_info, browserClient.get(), "file://" + path, browserSettings, nullptr, nullptr);
 
         return true;
+    }
+
+    void CEFRunMessageLoop()
+    {
+        CefRunMessageLoop();
+    }
+
+    void CEFShutdown()
+    {
+        DLOG(INFO) << "Shutting down CEF";
+        CefShutdown();
     }
 
     bool resizeUi(const size_t newHeight, const size_t newWidth, void **pixelbuffer)

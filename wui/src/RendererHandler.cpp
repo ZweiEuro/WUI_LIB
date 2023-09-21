@@ -3,13 +3,15 @@
 namespace wui
 {
 
-    RendererHandler::RendererHandler(void **destinationPixelBuffer, const size_t height, const size_t width) : height(height), width(width)
+    RendererHandler::RendererHandler(void **destinationPixelBuffer, const size_t width, const size_t height) : height(height), width(width), destinationPixelBuffer(destinationPixelBuffer)
     {
         this->resizing = false;
 
         this->rgbaPixelBuffer1 = calloc(4 * sizeof(char), height * width); // RGBA
         this->rgbaPixelBuffer2 = calloc(4 * sizeof(char), height * width); // RGBA
-        *destinationPixelBuffer = this->rgbaPixelBuffer1;
+        (*destinationPixelBuffer) = this->rgbaPixelBuffer1;
+
+        DLOG(INFO) << "RendererHandler: " << height << " " << width << " " << this->rgbaPixelBuffer1 << " " << this->rgbaPixelBuffer2;
     }
 
     RendererHandler::~RendererHandler()
@@ -18,6 +20,7 @@ namespace wui
 
     void RendererHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
     {
+        DLOG(INFO) << "GetViewRect " << this->width << " " << this->height;
         rect = CefRect(0, 0, width, height);
     }
 
@@ -27,8 +30,14 @@ namespace wui
         // Memory is unsafe
         if (this->resizing)
         {
+            DLOG(INFO) << "OnPaint: resizing";
             return;
         }
+
+        assert(destinationPixelBuffer != nullptr && *destinationPixelBuffer != nullptr && "destinationPixelBuffer is nullptr");
+
+        DLOG(INFO)
+            << "OnPaint: " << type << " " << width << " " << height;
 
         // The user currently draws this to their screen
         void *currentlyViewedBuffer = nullptr;
@@ -50,7 +59,11 @@ namespace wui
         // Copy the current buffer into the one we draw into next
         // Dirty draws would otherwise not be visible and we'd have partial draws on partial buffers
 
-        memcpy(currentlyDrawTargetBuffer, currentlyViewedBuffer, 4 * sizeof(char) * this->height * this->width);
+        size_t pixelBufferSize = 4 * sizeof(char) * this->height * this->width;
+
+        memcpy(currentlyDrawTargetBuffer, currentlyViewedBuffer, pixelBufferSize);
+
+#if 0 // Clean draw only dirty areas
 
         // Draw all the dirty rects into the current target buffer then swap buffers
         for (auto const rect : dirtyRects)
@@ -79,16 +92,43 @@ namespace wui
                     const size_t destination_offset = (destination_y * width + destination_x) * 4;
                     const size_t source_offset = (dirty_y * rect.width + dirty_x) * 4;
 
-                    ((uint8_t *)currentlyDrawTargetBuffer)[source_offset + 0] = ((uint8_t *)buffer)[destination_offset * 4 + 3];
-                    ((uint8_t *)currentlyDrawTargetBuffer)[source_offset + 1] = ((uint8_t *)buffer)[destination_offset * 4 + 0];
-                    ((uint8_t *)currentlyDrawTargetBuffer)[source_offset + 2] = ((uint8_t *)buffer)[destination_offset * 4 + 1];
-                    ((uint8_t *)currentlyDrawTargetBuffer)[source_offset + 3] = ((uint8_t *)buffer)[destination_offset * 4 + 2];
+                    ((uint8_t *)currentlyDrawTargetBuffer)[destination_offset + 0] = ((uint8_t *)buffer)[source_offset * 4 + 3];
+                    ((uint8_t *)currentlyDrawTargetBuffer)[destination_offset + 1] = ((uint8_t *)buffer)[source_offset * 4 + 0];
+                    ((uint8_t *)currentlyDrawTargetBuffer)[destination_offset + 2] = ((uint8_t *)buffer)[source_offset * 4 + 1];
+                    ((uint8_t *)currentlyDrawTargetBuffer)[destination_offset + 3] = ((uint8_t *)buffer)[source_offset * 4 + 2];
                 }
             }
         }
 
+#else
+
+        // bad idea block draw
+        auto buffer_rgba = new uint8_t[pixelBufferSize];
+        memset(buffer_rgba, 0, pixelBufferSize);
+
+        for (int i = 0; i < width * height; i++)
+        {
+
+            buffer_rgba[i * 4 + 0] = ((uint8_t *)buffer)[i * 4 + 3];
+            buffer_rgba[i * 4 + 1] = ((uint8_t *)buffer)[i * 4 + 0];
+            buffer_rgba[i * 4 + 2] = ((uint8_t *)buffer)[i * 4 + 1];
+            buffer_rgba[i * 4 + 3] = ((uint8_t *)buffer)[i * 4 + 2];
+
+            /*
+            B  -> A
+            G  -> R
+            R  -> G
+            A  -> B
+
+            */
+        }
+
+        memcpy(currentlyDrawTargetBuffer, (void *)((size_t)buffer_rgba), pixelBufferSize);
+
+#endif
+
         // Flip the buffers
         currentlyShowingBuffer1 = !currentlyShowingBuffer1;
-        *destinationPixelBuffer = currentlyDrawTargetBuffer;
+        (*destinationPixelBuffer) = currentlyDrawTargetBuffer;
     }
 }

@@ -12,15 +12,15 @@ namespace wui
     {
 
     private:
-        size_t height = 0;
         size_t width = 0;
+        size_t height = 0;
 
         // Double-buffering
         bool currentlyShowingBuffer1 = true;
         void *rgbaPixelBuffer1 = nullptr;
         void *rgbaPixelBuffer2 = nullptr;
 
-        void **destinationPixelBuffer;
+        void **destinationPixelBuffer = nullptr;
 
         std::atomic<bool> resizing;
 
