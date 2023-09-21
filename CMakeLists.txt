@@ -23,8 +23,8 @@ endif()
 #options
 set(WUI_CEF_VERSION "116.0.21+g9c7dc32+chromium-116.0.5845.181" CACHE STRING "CEF version to use")
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/wui)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/wui)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin)
 
 set(CEF_OUTPUT_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
@@ -98,12 +98,17 @@ if(CEF_CMAKE_OS_LINUX)
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/chrome-sandbox
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libcef.so
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libEGL.so
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libGLESv2.so
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libvk_swiftshader.so
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/libvulkan.so.1
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/snapshot_blob.bin
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/v8_context_snapshot.bin
             ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/$<CONFIG>/vk_swiftshader_icd.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/*
             ${CEF_OUTPUT_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Resources/locales/*
+            ${CEF_OUTPUT_DIR}/locales
         COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_CURRENT_SOURCE_DIR}/static_files/CMakeLists.X11.txt
             ${CEF_OUTPUT_DIR}/CMakeLists.txt
