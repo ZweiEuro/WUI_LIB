@@ -36,9 +36,6 @@ namespace wui
 
         assert(destinationPixelBuffer != nullptr && *destinationPixelBuffer != nullptr && "destinationPixelBuffer is nullptr");
 
-        DLOG(INFO)
-            << "OnPaint: " << type << " " << width << " " << height;
-
         // The user currently draws this to their screen
         void *currentlyViewedBuffer = nullptr;
 

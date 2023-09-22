@@ -30,8 +30,10 @@ function(cef_copy_dependencies target libPath)
             ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/snapshot_blob.bin
             ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/v8_context_snapshot.bin
             ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/vk_swiftshader_icd.json
-            ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/locales #This creates the folder
             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/locales
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/locales/*
             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/locales
