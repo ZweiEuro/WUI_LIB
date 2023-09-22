@@ -7,6 +7,13 @@ Includes automatic build scripts to download the most recent stable versions of 
 
 The build scripts includes a frame for windows and mac but was not yet tested.
 
+The resulting build will be in build/{Release/Debug/etc}. To use you will need _all_ of the files (they are runtime dependencies, shared libs including the main engine); place them next to your executable or else it will not find them cleanly. There is a helper function defined in 'static_files/CMakeLists.${platform}.txt' that will get copied over and included in your build process.
+
+`cef_copy_dependencies` will copy all dependencies next to your target.
+`cef_copy_ui_files` will copy your ui files (from a relative folder) to the executable so it can be found easily
+
+An easy example of how to use this properly is the example project [here](https://github.com/ZweiEuro/WUI_PROJ).
+
 Tested (2023-09-22) on:
 Arch Linux x86_64, Kernel 6.2.10-arch1-1, X11
 
