@@ -157,10 +157,10 @@ namespace wui
 
     void CEFSendMouseMoveEvent(const wui_mouse_event_t &event, bool mouseLeave)
     {
-        DLOG(INFO) << "Send Mouse Move Event: "
-                   << " X: " << event.x
-                   << " Y: " << event.y
-                   << " MouseLeave: " << mouseLeave;
+        /*      DLOG(INFO) << "Send Mouse Move Event: "
+                         << " X: " << event.x
+                         << " Y: " << event.y
+                         << " MouseLeave: " << mouseLeave;*/
 
         cef_mouse_event_t cefEvent = {
             .x = event.x,
