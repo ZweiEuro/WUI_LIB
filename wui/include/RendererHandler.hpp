@@ -34,6 +34,12 @@ namespace wui
         virtual void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height);
 
         IMPLEMENT_REFCOUNTING(RendererHandler);
+
+    public:
+        // Utility for library functionality
+
+        // Check the coordinate, if all pixel values are 0 we return false
+        bool coordinateEmpty(size_t x, size_t y) const;
     };
 
 }

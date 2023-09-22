@@ -131,4 +131,18 @@ namespace wui
         currentlyShowingBuffer1 = !currentlyShowingBuffer1;
         (*destinationPixelBuffer) = currentlyDrawTargetBuffer;
     }
+
+    bool RendererHandler::coordinateEmpty(size_t x, size_t y) const
+    {
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (((uint8_t *)(*destinationPixelBuffer))[(y * width + x) * 4 + i] != 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
