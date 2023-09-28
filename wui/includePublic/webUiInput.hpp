@@ -1,4 +1,4 @@
-#include <cstdint>
+#include <stdint.h>
 
 /**
  * Type definition for CEF input handling (needed as mirror for CEF)
