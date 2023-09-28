@@ -24,6 +24,7 @@ namespace wui
         rect = CefRect(0, 0, width, height);
     }
 
+    // buffer is in format BGRA
     void RendererHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height)
     {
 
@@ -60,69 +61,32 @@ namespace wui
 
         memcpy(currentlyDrawTargetBuffer, currentlyViewedBuffer, pixelBufferSize);
 
-#if 0 // Clean draw only dirty areas
-
-        // Draw all the dirty rects into the current target buffer then swap buffers
-        for (auto const rect : dirtyRects)
+        // check if its the entire thing
+        if (dirtyRects.size() == 1 && dirtyRects[0].height == height && dirtyRects[0].width == width)
         {
-
-            DLOG(INFO) << "dirty Rect: " << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << " " << width << " " << height;
-
-            // the buffer always holds the complete image
-            // so we need to calculate the offset and only use overwrite dirty rects
-
-            // dirty rect RGBA buffer
-
-            const int dirty_size = rect.width * rect.height * 4;
-
-            auto dirty_buffer = new uint8_t[dirty_size];
-            memset(dirty_buffer, 0, dirty_size);
-
-            // Draw each pixel individually (coordinates are else wrong), thinkg overdrawing a moving window in one block
-            for (int dirty_y = 0; dirty_y < rect.y; dirty_y++)
+            memcpy(currentlyDrawTargetBuffer, (void *)((size_t)buffer), pixelBufferSize);
+        }
+        else
+        {
+            // DLOG(INFO) << "Drawing dirty rects" << dirtyRects.size();
+            // Draw all the dirty rects into the current target buffer then swap buffers
+            for (auto const rect : dirtyRects)
             {
-                for (int dirty_x = 0; dirty_x < rect.x; dirty_x++)
+
+                // DLOG(INFO) << "dirty Rect: " << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << " " << width << " " << height;
+                // Copy over and convert every pixel
+                for (int line = 0; line < rect.height; line++)
                 {
-                    const size_t destination_x = dirty_x + rect.x;
-                    const size_t destination_y = dirty_y + rect.y;
 
-                    const size_t destination_offset = (destination_y * width + destination_x) * 4;
-                    const size_t source_offset = (dirty_y * rect.width + dirty_x) * 4;
+                    const size_t line_start_pos = (rect.x + rect.y * width + line * width) * 4;
 
-                    ((uint8_t *)currentlyDrawTargetBuffer)[destination_offset + 0] = ((uint8_t *)buffer)[source_offset * 4 + 3];
-                    ((uint8_t *)currentlyDrawTargetBuffer)[destination_offset + 1] = ((uint8_t *)buffer)[source_offset * 4 + 0];
-                    ((uint8_t *)currentlyDrawTargetBuffer)[destination_offset + 2] = ((uint8_t *)buffer)[source_offset * 4 + 1];
-                    ((uint8_t *)currentlyDrawTargetBuffer)[destination_offset + 3] = ((uint8_t *)buffer)[source_offset * 4 + 2];
+                    const uint8_t *destination = (((uint8_t *)currentlyDrawTargetBuffer) + line_start_pos);
+                    const uint8_t *source = (((uint8_t *)buffer) + line_start_pos);
+
+                    memcpy((void *)destination, (void *)source, rect.width);
                 }
             }
         }
-
-#else
-
-        // bad idea block draw
-        auto buffer_rgba = new uint8_t[pixelBufferSize];
-        memset(buffer_rgba, 0, pixelBufferSize);
-
-        for (int i = 0; i < width * height; i++)
-        {
-
-            buffer_rgba[i * 4 + 0] = ((uint8_t *)buffer)[i * 4 + 3];
-            buffer_rgba[i * 4 + 1] = ((uint8_t *)buffer)[i * 4 + 0];
-            buffer_rgba[i * 4 + 2] = ((uint8_t *)buffer)[i * 4 + 1];
-            buffer_rgba[i * 4 + 3] = ((uint8_t *)buffer)[i * 4 + 2];
-
-            /*
-            B  -> A
-            G  -> R
-            R  -> G
-            A  -> B
-
-            */
-        }
-
-        memcpy(currentlyDrawTargetBuffer, (void *)((size_t)buffer_rgba), pixelBufferSize);
-
-#endif
 
         // Flip the buffers
         currentlyShowingBuffer1 = !currentlyShowingBuffer1;
@@ -136,6 +100,9 @@ namespace wui
         {
             if (((uint8_t *)(*destinationPixelBuffer))[(y * width + x) * 4 + i] != 0)
             {
+                for (int i = 0; i < 4; i++)
+                    DLOG(INFO) << "color: " << i << " " << (int)((uint8_t *)(*destinationPixelBuffer))[(y * width + x) * 4 + i];
+
                 return false;
             }
         }

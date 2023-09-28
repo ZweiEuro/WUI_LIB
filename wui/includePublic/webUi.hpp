@@ -17,7 +17,7 @@ namespace wui
      * @note Check validity of the pixelbuffer against nullptr
      * @note MUST be called after CEFInit and from the same thread.
      *
-     * @param pixelBuffer Destination Pointer. Internally double-buffered. Format:RGBA
+     * @param pixelBuffer Destination Pointer. Internally double-buffered. Format:BGRA (low to high)
      * @param initialHeight Initial height of the web ui.
      * @param initialWidth Initial width of the web ui.
      * @param path Relative path to the html folter (default: "html/") that contains a index.html file.
@@ -30,7 +30,7 @@ namespace wui
      *
      * @param newHeight New height of the web ui.
      * @param newWidth New width of the web ui.
-     * @param pixelbuffer New Destination Pointer. if nullptr, the old pointer is used. Format:RGBA
+     * @param pixelbuffer New Destination Pointer. if nullptr, the old pointer is used. Format:BGRA (low to high)
      * @return true If the resize was successful.
      * @return false If the resize failed.
      */
