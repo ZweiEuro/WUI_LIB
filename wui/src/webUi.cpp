@@ -1,7 +1,7 @@
 
 #include "webUi.hpp"
-#include "RendererHandler.hpp"
-#include "BrowserClient.hpp"
+#include "BufferRenderingHandler.hpp"
+#include "Client.hpp"
 #include "webUiPrivat.hpp"
 
 #include "include/cef_browser.h"
@@ -11,8 +11,8 @@
 namespace wui
 {
 
-    CefRefPtr<wui::RendererHandler> rendererHandler;
-    CefRefPtr<wui::BrowserClient> browserClient;
+    CefRefPtr<wui::BufferRenderingHandler> rendererHandler;
+    CefRefPtr<wui::Client> browserClient;
     CefRefPtr<CefBrowser> browser;
 
     bool CEFInit(int argc, char **argv)
@@ -78,10 +78,10 @@ namespace wui
         window_info.SetAsWindowless(0); // false means no transparency (site background colour)
 
         DLOG(INFO) << "Renderer Init";
-        rendererHandler = new wui::RendererHandler(pixelBuffer, initialHeight, initialWidth);
+        rendererHandler = new wui::BufferRenderingHandler(pixelBuffer, initialHeight, initialWidth);
 
         DLOG(INFO) << "Browser Init";
-        browserClient = new wui::BrowserClient(rendererHandler);
+        browserClient = new wui::Client(rendererHandler);
 
         CefBrowserSettings browserSettings;
         browserSettings.windowless_frame_rate = 60; // 30 is default

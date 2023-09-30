@@ -9,7 +9,10 @@
 
 namespace wui
 {
-    class RendererHandler : public CefRenderHandler
+    /**
+     * Rendering Handler to render into a buffer
+     */
+    class BufferRenderingHandler : public CefRenderHandler
     {
 
     private:
@@ -26,15 +29,14 @@ namespace wui
         std::mutex output_buffers_lock;
 
     public:
-        RendererHandler(void **destinationPixelBuffer, const size_t height, const size_t width);
-        ~RendererHandler();
+        BufferRenderingHandler(void **destinationPixelBuffer, const size_t height, const size_t width);
+        ~BufferRenderingHandler();
 
         // Interface implementation
-        virtual void GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect);
+        void GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
+        void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
 
-        virtual void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height);
-
-        IMPLEMENT_REFCOUNTING(RendererHandler);
+        IMPLEMENT_REFCOUNTING(BufferRenderingHandler);
 
     public:
         // Utility for library functionality

@@ -1,9 +1,9 @@
-#include <RendererHandler.hpp>
+#include <BufferRenderingHandler.hpp>
 
 namespace wui
 {
 
-    RendererHandler::RendererHandler(void **destinationPixelBuffer, const size_t width, const size_t height) : height(height), width(width), destinationPixelBuffer(destinationPixelBuffer)
+    BufferRenderingHandler::BufferRenderingHandler(void **destinationPixelBuffer, const size_t width, const size_t height) : height(height), width(width), destinationPixelBuffer(destinationPixelBuffer)
     {
 
         this->rgbaPixelBuffer1 = calloc(4 * sizeof(char), height * width);
@@ -16,18 +16,18 @@ namespace wui
         DLOG(INFO) << "RendererHandler: " << height << " " << width << " " << this->rgbaPixelBuffer1 << " " << this->rgbaPixelBuffer2;
     }
 
-    RendererHandler::~RendererHandler()
+    BufferRenderingHandler::~BufferRenderingHandler()
     {
     }
 
-    void RendererHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
+    void BufferRenderingHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
     {
         DLOG(INFO) << "GetViewRect " << this->width << " " << this->height;
         rect = CefRect(0, 0, width, height);
     }
 
     // buffer is in format BGRA
-    void RendererHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height)
+    void BufferRenderingHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height)
     {
 
         // Memory is unsafe
@@ -96,7 +96,7 @@ namespace wui
         this->output_buffers_lock.unlock();
     }
 
-    bool RendererHandler::coordinateEmpty(size_t x, size_t y)
+    bool BufferRenderingHandler::coordinateEmpty(size_t x, size_t y)
     {
         this->output_buffers_lock.lock();
 
@@ -115,7 +115,7 @@ namespace wui
         return true;
     }
 
-    bool RendererHandler::resize(size_t newWidth, size_t newHeight, void **newDestinationPixelBuffer)
+    bool BufferRenderingHandler::resize(size_t newWidth, size_t newHeight, void **newDestinationPixelBuffer)
     {
 
         if (this->width == newWidth && this->height == newHeight)
