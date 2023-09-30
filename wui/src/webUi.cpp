@@ -121,9 +121,13 @@ namespace wui
         CefShutdown();
     }
 
-    bool resizeUi(const size_t newHeight, const size_t newWidth, void **pixelbuffer)
+    void resizeUi(const size_t newWidth, const size_t newHeight, void **newDestinationPixelBuffer)
     {
-        return false;
+
+        if (rendererHandler->resize(newWidth, newHeight, newDestinationPixelBuffer))
+        {
+            browser->GetHost()->WasResized();
+        }
     }
 
 }

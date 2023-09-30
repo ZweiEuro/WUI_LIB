@@ -28,13 +28,11 @@ namespace wui
      * @brief Resize the web ui.
      * @note Check validity of the pixelbuffer against nullptr
      *
-     * @param newHeight New height of the web ui.
      * @param newWidth New width of the web ui.
+     * @param newHeight New height of the web ui.
      * @param pixelbuffer New Destination Pointer. if nullptr, the old pointer is used. Format:BGRA (low to high)
-     * @return true If the resize was successful.
-     * @return false If the resize failed.
      */
-    bool resizeUi(const size_t newHeight, const size_t newWidth, void **pixelbuffer = nullptr);
+    void resizeUi(const size_t newWidth, const size_t newHeight, void **newDestinationPixelBuffer = nullptr);
 
     /**
      * @brief Exit when receiving shutdown command, never returns.

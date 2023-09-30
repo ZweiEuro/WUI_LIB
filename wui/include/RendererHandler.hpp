@@ -5,6 +5,7 @@
 #include <include/cef_render_handler.h>
 
 #include <atomic>
+#include <mutex>
 
 namespace wui
 {
@@ -22,7 +23,7 @@ namespace wui
 
         void **destinationPixelBuffer = nullptr;
 
-        std::atomic<bool> resizing;
+        std::mutex output_buffers_lock;
 
     public:
         RendererHandler(void **destinationPixelBuffer, const size_t height, const size_t width);
@@ -39,7 +40,11 @@ namespace wui
         // Utility for library functionality
 
         // Check the coordinate, if all pixel values are 0 we return false
-        bool coordinateEmpty(size_t x, size_t y) const;
+        bool coordinateEmpty(size_t x, size_t y);
+
+        // Resize and change destination buffer IF a new one is given
+        // return false if already resizing
+        bool resize(size_t newWdith, size_t newHeight, void **newDestinationPixelBuffer = nullptr);
     };
 
 }
