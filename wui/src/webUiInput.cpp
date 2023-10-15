@@ -29,7 +29,6 @@ namespace wui
         };
 
         browser->GetHost()->SendMouseClickEvent(CefMouseEvent(cefEvent), (CefBrowserHost::MouseButtonType)type, mouseUp, clickCount);
-
         return true;
     }
 

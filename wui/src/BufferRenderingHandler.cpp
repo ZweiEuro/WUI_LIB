@@ -30,6 +30,12 @@ namespace wui
     void BufferRenderingHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height)
     {
 
+        if (width != this->width || height != this->height)
+        {
+            DLOG(WARNING) << "OnPaint: width and height do not match";
+            return;
+        }
+
         // Memory is unsafe
         this->output_buffers_lock.lock();
 
