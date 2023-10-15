@@ -1,5 +1,4 @@
 build/
-docs/A1_GameConcept
 CEF/
 !*/*.gitkeep
 cef_binary_*
