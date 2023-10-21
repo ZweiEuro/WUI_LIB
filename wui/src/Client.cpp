@@ -15,7 +15,7 @@ namespace wui
         return m_renderHandler;
     }
 
-    CefRefPtr<RenderHandler> Client::GetOffscreenRenderHandler()
+    CefRefPtr<RenderHandler> Client::GetWUIRenderHandler()
     {
         return m_renderHandler;
     }

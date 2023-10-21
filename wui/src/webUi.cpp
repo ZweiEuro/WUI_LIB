@@ -7,20 +7,24 @@
 
 #include "include/cef_browser.h"
 
-#include <filesystem>
-
 namespace wui
 {
 
-    CefRefPtr<wui::RenderHandler> rendererHandler;
-    CefRefPtr<wui::Client> browserClient;
-    CefRefPtr<CefBrowser> browser;
+    CefRefPtr<wui::App> app;
+    CefMainArgs args;
 
     bool CEFInit(int argc, char **argv)
     {
-        CefMainArgs args(argc, argv);
 
-        auto app = new wui::App();
+        if (app.get() != nullptr)
+        {
+            DLOG(ERROR) << "Web UI already initialized";
+            return false;
+        }
+
+        args = CefMainArgs(argc, argv);
+
+        app = new wui::App();
 
         int pid = CefExecuteProcess(args, app, nullptr);
 
@@ -31,6 +35,15 @@ namespace wui
             // child process has nothin more to do
             exit(pid);
         }
+
+        return true;
+    }
+
+    bool startWui(void **pixelBuffer, const size_t initialHeight, const size_t initialWidth, std::string path)
+    {
+        DLOG(INFO) << "Starting Web UI";
+
+        app->GetWUIBrowserProcessHandler()->setClientViewParams(pixelBuffer, initialHeight, initialWidth, path);
 
         CefSettings settings;
 
@@ -53,7 +66,7 @@ namespace wui
 
         // init custom scheme for local files
 
-        bool init_res = CefInitialize(args, settings, nullptr, nullptr);
+        bool init_res = CefInitialize(args, settings, app, nullptr);
 
         // CefInitialize creates a sub-proccess and executes the same executeable, as calling CefInitialize, if not set different in settings.browser_subprocess_path
         // if you create an extra program just for the childproccess you only have to call CefExecuteProcess(...) in it.
@@ -63,49 +76,6 @@ namespace wui
             DLOG(ERROR) << "CefInitialize failed";
             exit(-2);
         }
-
-        return init_res;
-    }
-
-    bool startWui(void **pixelBuffer, const size_t initialHeight, const size_t initialWidth, std::string path)
-    {
-        DLOG(INFO) << "Starting Web UI";
-
-        if (browserClient.get() != nullptr)
-        {
-            DLOG(ERROR) << "Web UI already started";
-            return false;
-        }
-
-        CefWindowInfo window_info;
-        window_info.SetAsWindowless(0); // false means no transparency (site background colour)
-
-        DLOG(INFO) << "Browser Init";
-        browserClient = new wui::Client(pixelBuffer, initialHeight, initialWidth);
-
-        CefBrowserSettings browserSettings;
-        browserSettings.windowless_frame_rate = 60; // 30 is default
-
-        // If path does not start with '/', it is relative to the current working directory.
-        if (path.front() != '/')
-        {
-            path = std::filesystem::current_path().string() + "/" + path;
-        }
-
-        // if path does not end with '/', add it
-        if (path.back() != '/')
-        {
-            path += "/";
-        }
-
-        path += "index.html";
-
-        DLOG(INFO)
-            << "Open File: " << path
-            << " in Browser, with URL: "
-            << "file://" + path;
-
-        browser = CefBrowserHost::CreateBrowserSync(window_info, browserClient.get(), "file://" + path, browserSettings, nullptr, nullptr);
 
         return true;
     }
@@ -124,9 +94,9 @@ namespace wui
     void resizeUi(const size_t newWidth, const size_t newHeight, void **newDestinationPixelBuffer)
     {
 
-        if (browserClient->GetOffscreenRenderHandler()->resize(newWidth, newHeight, newDestinationPixelBuffer))
+        if (app->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->resize(newWidth, newHeight, newDestinationPixelBuffer))
         {
-            browser->GetHost()->WasResized();
+            app->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->WasResized();
         }
     }
 

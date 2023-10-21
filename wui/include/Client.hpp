@@ -13,13 +13,15 @@ namespace wui
     private:
         CefRefPtr<RenderHandler> m_renderHandler;
 
+        IMPLEMENT_REFCOUNTING(Client);
+
     public:
         Client(void **destinationPixelBuffer, const size_t height, const size_t width);
 
         virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override;
 
-        CefRefPtr<RenderHandler> GetOffscreenRenderHandler();
+        CefRefPtr<RenderHandler> GetWUIRenderHandler();
 
-        IMPLEMENT_REFCOUNTING(Client);
+        // WUI
     };
 }

@@ -1,4 +1,6 @@
+#pragma once
 #include "include/cef_app.h"
+#include "BrowserProcessHandler.hpp"
 
 namespace wui
 {
@@ -8,18 +10,26 @@ namespace wui
     {
 
     private:
-        // Handles the renderer side of query routing.
-        CefRefPtr<CefRenderProcessHandler> render_process_handler_;
-
-        IMPLEMENT_REFCOUNTING(App);
+        CefRefPtr<BrowserProcessHandler> browser_process_handler_;
 
         App(const App &) = delete;
         App &operator=(const App &) = delete;
 
+        IMPLEMENT_REFCOUNTING(App);
+
     public:
         App();
+        virtual ~App(); // Necessary for complete VTABLE
 
-        // CefApp methods:
+        void OnBeforeCommandLineProcessing(
+            const CefString &process_type,
+            CefRefPtr<CefCommandLine> command_line) override;
+
         CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override;
+        CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override;
+
+        // WUI Functions
+
+        CefRefPtr<BrowserProcessHandler> GetWUIBrowserProcessHandler();
     };
 }
