@@ -1,6 +1,7 @@
 #pragma once
 #include "include/cef_app.h"
 #include "BrowserProcessHandler.hpp"
+#include "RenderProcessHandler.hpp"
 
 namespace wui
 {
@@ -11,6 +12,7 @@ namespace wui
 
     private:
         CefRefPtr<BrowserProcessHandler> browser_process_handler_;
+        CefRefPtr<RenderProcessHandler> render_process_handler_;
 
         App(const App &) = delete;
         App &operator=(const App &) = delete;

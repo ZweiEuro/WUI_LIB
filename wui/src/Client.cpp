@@ -1,7 +1,7 @@
 #include "Client.hpp"
 #include "RenderHandler.hpp"
 #include "include/wrapper/cef_helpers.h"
-#include "MesssageHandler.hpp"
+#include "MessageHandler.hpp"
 
 namespace wui
 {

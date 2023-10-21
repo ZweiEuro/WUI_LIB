@@ -19,22 +19,7 @@ namespace wui
                      int64_t query_id,
                      const CefString &request,
                      bool persistent,
-                     CefRefPtr<Callback> callback) override
-        {
-            DLOG(INFO) << "got query" << request.ToString();
-
-            const std::string &message_name = request;
-            if (message_name.find(kTestMessageName) == 0)
-            {
-                // Reverse the string and return.
-                std::string result = message_name.substr(sizeof(kTestMessageName));
-                std::reverse(result.begin(), result.end());
-                callback->Success(result);
-                return true;
-            }
-
-            return false;
-        }
+                     CefRefPtr<Callback> callback) override;
 
     private:
         MessageHandler(const MessageHandler &) = delete;

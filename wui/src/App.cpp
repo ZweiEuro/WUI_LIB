@@ -7,6 +7,7 @@ namespace wui
     App::App()
     {
         browser_process_handler_ = new BrowserProcessHandler();
+        render_process_handler_ = new RenderProcessHandler();
     }
 
     App::~App()
@@ -17,7 +18,7 @@ namespace wui
     CefRefPtr<CefRenderProcessHandler> App::GetRenderProcessHandler()
     {
         // not needed yet
-        return nullptr;
+        return render_process_handler_;
     }
 
     CefRefPtr<CefBrowserProcessHandler> App::GetBrowserProcessHandler()
