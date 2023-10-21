@@ -7,15 +7,18 @@ namespace wui
 {
 
     // Client actually handling the html internals
+    // the client also holds the renderHandler
     class Client : public CefClient
     {
     private:
-        CefRefPtr<CefRenderHandler> m_renderHandler;
+        CefRefPtr<RenderHandler> m_renderHandler;
 
     public:
-        Client(CefRefPtr<wui::RenderHandler> &renderHandler);
+        Client(void **destinationPixelBuffer, const size_t height, const size_t width);
 
         virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override;
+
+        CefRefPtr<RenderHandler> GetOffscreenRenderHandler();
 
         IMPLEMENT_REFCOUNTING(Client);
     };

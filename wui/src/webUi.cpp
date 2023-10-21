@@ -71,7 +71,7 @@ namespace wui
     {
         DLOG(INFO) << "Starting Web UI";
 
-        if (rendererHandler.get() != nullptr)
+        if (browserClient.get() != nullptr)
         {
             DLOG(ERROR) << "Web UI already started";
             return false;
@@ -80,11 +80,8 @@ namespace wui
         CefWindowInfo window_info;
         window_info.SetAsWindowless(0); // false means no transparency (site background colour)
 
-        DLOG(INFO) << "Renderer Init";
-        rendererHandler = new wui::RenderHandler(pixelBuffer, initialHeight, initialWidth);
-
         DLOG(INFO) << "Browser Init";
-        browserClient = new wui::Client(rendererHandler);
+        browserClient = new wui::Client(pixelBuffer, initialHeight, initialWidth);
 
         CefBrowserSettings browserSettings;
         browserSettings.windowless_frame_rate = 60; // 30 is default
@@ -127,7 +124,7 @@ namespace wui
     void resizeUi(const size_t newWidth, const size_t newHeight, void **newDestinationPixelBuffer)
     {
 
-        if (rendererHandler->resize(newWidth, newHeight, newDestinationPixelBuffer))
+        if (browserClient->GetOffscreenRenderHandler()->resize(newWidth, newHeight, newDestinationPixelBuffer))
         {
             browser->GetHost()->WasResized();
         }

@@ -11,6 +11,7 @@ namespace wui
 {
     /**
      * Rendering Handler to render into a buffer
+     * Its an offscreen renderer with internal double buffering
      */
     class RenderHandler : public CefRenderHandler
     {
