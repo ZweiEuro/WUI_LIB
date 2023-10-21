@@ -3,7 +3,7 @@
 namespace wui
 {
 
-    Client::Client(CefRefPtr<wui::BufferRenderingHandler> &renderHandler)
+    Client::Client(CefRefPtr<wui::RenderHandler> &renderHandler)
         : m_renderHandler(renderHandler)
     {
     }

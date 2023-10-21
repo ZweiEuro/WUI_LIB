@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BufferRenderingHandler.hpp"
+#include "RenderHandler.hpp"
 #include "include/cef_client.h"
 
 namespace wui
@@ -13,7 +13,7 @@ namespace wui
         CefRefPtr<CefRenderHandler> m_renderHandler;
 
     public:
-        Client(CefRefPtr<wui::BufferRenderingHandler> &renderHandler);
+        Client(CefRefPtr<wui::RenderHandler> &renderHandler);
 
         virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override;
 

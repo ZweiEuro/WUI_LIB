@@ -1,9 +1,9 @@
-#include <BufferRenderingHandler.hpp>
+#include <RenderHandler.hpp>
 
 namespace wui
 {
 
-    BufferRenderingHandler::BufferRenderingHandler(void **destinationPixelBuffer, const size_t width, const size_t height) : height(height), width(width), destinationPixelBuffer(destinationPixelBuffer)
+    RenderHandler::RenderHandler(void **destinationPixelBuffer, const size_t width, const size_t height) : height(height), width(width), destinationPixelBuffer(destinationPixelBuffer)
     {
 
         this->rgbaPixelBuffer1 = calloc(4 * sizeof(char), height * width);
@@ -16,22 +16,24 @@ namespace wui
         DLOG(INFO) << "RendererHandler: " << height << " " << width << " " << this->rgbaPixelBuffer1 << " " << this->rgbaPixelBuffer2;
     }
 
-    BufferRenderingHandler::~BufferRenderingHandler()
+    RenderHandler::~RenderHandler()
     {
     }
 
-    void BufferRenderingHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
+    void RenderHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
     {
         DLOG(INFO) << "GetViewRect " << this->width << " " << this->height;
         rect = CefRect(0, 0, width, height);
     }
 
     // buffer is in format BGRA
-    void BufferRenderingHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height)
+    void RenderHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height)
     {
 
         if (width != this->width || height != this->height)
         {
+            // This can happen when a resize event was processed fast enough before a onPaint event was finished with the old buffer
+            // obviously missaligned buffers are not good
             DLOG(WARNING) << "OnPaint: width and height do not match";
             return;
         }
@@ -102,7 +104,7 @@ namespace wui
         this->output_buffers_lock.unlock();
     }
 
-    bool BufferRenderingHandler::coordinateEmpty(size_t x, size_t y)
+    bool RenderHandler::coordinateEmpty(size_t x, size_t y)
     {
         this->output_buffers_lock.lock();
 
@@ -121,7 +123,7 @@ namespace wui
         return true;
     }
 
-    bool BufferRenderingHandler::resize(size_t newWidth, size_t newHeight, void **newDestinationPixelBuffer)
+    bool RenderHandler::resize(size_t newWidth, size_t newHeight, void **newDestinationPixelBuffer)
     {
 
         if (this->width == newWidth && this->height == newHeight)

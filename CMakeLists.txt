@@ -11,6 +11,8 @@ if( NOT CMAKE_BUILD_TYPE )
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_COLOR_DIAGNOSTICS ON)
+
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cef_cmake.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/get_cef_version.cmake)

@@ -86,5 +86,9 @@
     "hash_set": "cpp"
   },
   "prettier.printWidth": 180,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "cmake.buildTask": true,
+  "cmake.environment": {
+    "CLICOLOR_FORCE": "1"
+  }
 }

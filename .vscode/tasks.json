@@ -7,7 +7,7 @@
       "label": "setup build",
       "type": "shell",
       "command": "cd ${workspaceFolder} && mkdir -p '${workspaceFolder}/build' && cd ${workspaceFolder}/build && cmake -G 'Ninja' -DCMAKE_BUILD_TYPE=Debug ..  && ninja -j8 ",
-      "problemMatcher": []
+      "problemMatcher": ["$gcc"]
     },
     {
       "label": "build",

@@ -1,8 +1,9 @@
 
 #include "webUi.hpp"
-#include "BufferRenderingHandler.hpp"
+#include "RenderHandler.hpp"
 #include "Client.hpp"
 #include "webUiPrivat.hpp"
+#include "App.hpp"
 
 #include "include/cef_browser.h"
 
@@ -11,7 +12,7 @@
 namespace wui
 {
 
-    CefRefPtr<wui::BufferRenderingHandler> rendererHandler;
+    CefRefPtr<wui::RenderHandler> rendererHandler;
     CefRefPtr<wui::Client> browserClient;
     CefRefPtr<CefBrowser> browser;
 
@@ -19,7 +20,9 @@ namespace wui
     {
         CefMainArgs args(argc, argv);
 
-        int pid = CefExecuteProcess(args, nullptr, nullptr);
+        auto app = new wui::App();
+
+        int pid = CefExecuteProcess(args, app, nullptr);
 
         // checkout CefApp, derive it and set it as second parameter, for more control on
         // command args and resources.
@@ -78,7 +81,7 @@ namespace wui
         window_info.SetAsWindowless(0); // false means no transparency (site background colour)
 
         DLOG(INFO) << "Renderer Init";
-        rendererHandler = new wui::BufferRenderingHandler(pixelBuffer, initialHeight, initialWidth);
+        rendererHandler = new wui::RenderHandler(pixelBuffer, initialHeight, initialWidth);
 
         DLOG(INFO) << "Browser Init";
         browserClient = new wui::Client(rendererHandler);
