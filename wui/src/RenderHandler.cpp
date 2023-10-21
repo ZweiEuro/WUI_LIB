@@ -13,7 +13,7 @@ namespace wui
         assert(this->rgbaPixelBuffer2 != nullptr && "could not allocate rgbaPixelBuffer1");
         (*destinationPixelBuffer) = this->rgbaPixelBuffer1;
 
-        DLOG(INFO) << "RendererHandler: " << height << " " << width << " " << this->rgbaPixelBuffer1 << " " << this->rgbaPixelBuffer2;
+        // DLOG(INFO) << "RendererHandler: " << height << " " << width << " " << this->rgbaPixelBuffer1 << " " << this->rgbaPixelBuffer2;
     }
 
     RenderHandler::~RenderHandler()
@@ -22,7 +22,7 @@ namespace wui
 
     void RenderHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect)
     {
-        DLOG(INFO) << "GetViewRect " << this->width << " " << this->height;
+        // DLOG(INFO) << "GetViewRect " << this->width << " " << this->height;
         rect = CefRect(0, 0, width, height);
     }
 
@@ -82,7 +82,7 @@ namespace wui
             for (auto const rect : dirtyRects)
             {
 
-                DLOG(INFO) << "dirty Rect: " << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << " " << width << " " << height;
+                // DLOG(INFO) << "dirty Rect: " << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << " " << width << " " << height;
                 // Copy over and convert every pixel
                 for (int line = 0; line < rect.height; line++)
                 {
@@ -112,8 +112,8 @@ namespace wui
         {
             if (((uint8_t *)(*destinationPixelBuffer))[(y * width + x) * 4 + i] != 0)
             {
-                for (int i = 0; i < 4; i++)
-                    DLOG(INFO) << "color: " << i << " " << (int)((uint8_t *)(*destinationPixelBuffer))[(y * width + x) * 4 + i];
+                //  for (int i = 0; i < 4; i++)
+                //    { DLOG(INFO) << "color: " << i << " " << (int)((uint8_t *)(*destinationPixelBuffer))[(y * width + x) * 4 + i];}
 
                 this->output_buffers_lock.unlock();
                 return false;
@@ -128,13 +128,13 @@ namespace wui
 
         if (this->width == newWidth && this->height == newHeight)
         {
-            DLOG(INFO) << "No need to resize, same size";
+            // DLOG(INFO) << "No need to resize, same size";
             return false;
         }
 
         this->output_buffers_lock.lock();
 
-        DLOG(INFO) << "Resizing to " << newHeight << " " << newWidth;
+        // DLOG(INFO) << "Resizing to " << newHeight << " " << newWidth;
 
         // set destination to nullptr
         assert(destinationPixelBuffer != nullptr && "destinationPixelBuffer is nullptr");
@@ -161,7 +161,7 @@ namespace wui
         this->width = newWidth;
 
         // set resizing to false
-        DLOG(INFO) << "Resizing done";
+        // DLOG(INFO) << "Resizing done";
         this->output_buffers_lock.unlock();
         return true;
     }
