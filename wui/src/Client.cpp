@@ -2,6 +2,7 @@
 #include "RenderHandler.hpp"
 #include "include/wrapper/cef_helpers.h"
 #include "MessageHandler.hpp"
+#include "messageRouter/messageRouterConfig.hpp"
 
 namespace wui
 {
@@ -41,8 +42,7 @@ namespace wui
         {
             DLOG(INFO) << "Creating message router";
             // Create the browser-side router for query handling.
-            CefMessageRouterConfig config;
-            message_router_ = CefMessageRouterBrowserSide::Create(config);
+            message_router_ = CefMessageRouterBrowserSide::Create(getMessageRouterConfig());
 
             // Register handlers with the router.
             message_handler_.reset(new wui::MessageHandler());

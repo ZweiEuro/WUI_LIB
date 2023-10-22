@@ -1,6 +1,6 @@
 #pragma once
 #include "include/wrapper/cef_message_router.h"
-
+#include "messageRouter/messageRouterConfig.hpp"
 namespace wui
 {
 
@@ -13,10 +13,8 @@ namespace wui
         // CefRenderProcessHandler methods:
         void OnWebKitInitialized() override
         {
-            DLOG(INFO) << "Create renderer side router";
             // Create the renderer-side router for query handling.
-            CefMessageRouterConfig config;
-            message_router_ = CefMessageRouterRendererSide::Create(config);
+            message_router_ = CefMessageRouterRendererSide::Create(getMessageRouterConfig());
         }
 
         void OnContextCreated(CefRefPtr<CefBrowser> browser,
