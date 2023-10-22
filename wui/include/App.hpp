@@ -33,5 +33,6 @@ namespace wui
         // WUI Functions
 
         CefRefPtr<BrowserProcessHandler> GetWUIBrowserProcessHandler();
+        CefRefPtr<RenderProcessHandler> GetWUIRenderProcessHandler();
     };
 }

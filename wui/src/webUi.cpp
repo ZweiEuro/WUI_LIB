@@ -10,7 +10,6 @@
 namespace wui
 {
 
-    CefRefPtr<wui::App> app;
     CefMainArgs args;
 
     bool CEFInit(int argc, char **argv)

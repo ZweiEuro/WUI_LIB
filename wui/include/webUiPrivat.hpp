@@ -11,4 +11,7 @@ namespace wui
 {
 
     extern CefRefPtr<wui::App> app;
+
+    bool appExists();
+
 }
