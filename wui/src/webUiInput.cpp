@@ -14,12 +14,12 @@ namespace wui
             return false;
         }
 
-        DLOG(INFO) << "Send Mouse Click Event: "
-                   << " X: " << event.x
-                   << " Y: " << event.y
-                   << " Type: " << type
-                   << " MouseUp: " << mouseUp
-                   << " ClickCount: " << clickCount;
+        // DLOG(INFO) << "Send Mouse Click Event: "
+        //            << " X: " << event.x
+        //            << " Y: " << event.y
+        //            << " Type: " << type
+        //            << " MouseUp: " << mouseUp
+        //            << " ClickCount: " << clickCount;
 
         if (force == false && app->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->coordinateEmpty(event.x,
                                                                                                                       event.y))
@@ -46,10 +46,10 @@ namespace wui
             DLOG(INFO) << "App is nullptr";
             return;
         }
-        /*      DLOG(INFO) << "Send Mouse Move Event: "
-                         << " X: " << event.x
-                         << " Y: " << event.y
-                         << " MouseLeave: " << mouseLeave;*/
+        // DLOG(INFO) << "Send Mouse Move Event: "
+        //            << " X: " << event.x
+        //            << " Y: " << event.y
+        //            << " MouseLeave: " << mouseLeave;
 
         cef_mouse_event_t cefEvent = {
             .x = event.x,
@@ -68,11 +68,11 @@ namespace wui
             return false;
         }
 
-        DLOG(INFO) << "Send Mouse Wheel Event: "
-                   << " X: " << event.x
-                   << " Y: " << event.y
-                   << " DeltaX: " << deltaX
-                   << " DeltaY: " << deltaY;
+        // DLOG(INFO) << "Send Mouse Wheel Event: "
+        //            << " X: " << event.x
+        //            << " Y: " << event.y
+        //            << " DeltaX: " << deltaX
+        //            << " DeltaY: " << deltaY;
 
         if (force == false && app->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->coordinateEmpty(event.x,
                                                                                                                       event.y))
@@ -98,13 +98,13 @@ namespace wui
             DLOG(INFO) << "App is nullptr";
             return;
         }
-        DLOG(INFO) << "Send Key Event: "
-                   << " Type: " << event.type
-                   << " Modifiers: " << event.modifiers
-                   << " WindowsKeyCode: " << event.windows_key_code
-                   << " NativeKeyCode: " << event.native_key_code
-                   << " IsSystemKey: " << event.is_system_key
-                   << " FocusOnEditableField: " << event.focus_on_editable_field;
+        // DLOG(INFO) << "Send Key Event: "
+        //            << " Type: " << event.type
+        //            << " Modifiers: " << event.modifiers
+        //            << " WindowsKeyCode: " << event.windows_key_code
+        //            << " NativeKeyCode: " << event.native_key_code
+        //            << " IsSystemKey: " << event.is_system_key
+        //            << " FocusOnEditableField: " << event.focus_on_editable_field;
 
         cef_key_event_t cefEvent = {
             .type = (cef_key_event_type_t)event.type,
