@@ -88,9 +88,10 @@ if(CEF_CMAKE_OS_LINUX)
         debug ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Debug/libcef.so
         optimized ${CMAKE_CURRENT_SOURCE_DIR}/${cefName}/Release/libcef.so
     )
-    
+
+
     add_custom_command(TARGET cefdll_wrapper POST_BUILD
-        COMMENT "Copy CEF dependencies"
+        COMMENT "Copy CEF build and runtime dependencies"
         COMMAND ${CMAKE_COMMAND} -E
             make_directory ${CEF_OUTPUT_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -114,7 +115,13 @@ if(CEF_CMAKE_OS_LINUX)
         COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_CURRENT_SOURCE_DIR}/static_files/CMakeLists.X11.txt
             ${CEF_OUTPUT_DIR}/CMakeLists.txt
-    )
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_BINARY_DIR}/wui/libs/cJSON/include
+            ${CEF_OUTPUT_DIR}/include
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_CURRENT_BINARY_DIR}/wui/libs/cJSON/lib/libcjson.so
+            ${CEF_OUTPUT_DIR}
+        )
 
 
     if(CEF_USE_SANDBOX)

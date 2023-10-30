@@ -1,7 +1,7 @@
 #final Cmake file for the finished build
 
 target_link_directories(${PROJECT_NAME} PUBLIC .)
-target_link_libraries(${PROJECT_NAME} PUBLIC wui cefdll_wrapper cef EGL vk_swiftshader vulkan)
+target_link_libraries(${PROJECT_NAME} PUBLIC wui cefdll_wrapper cef EGL vk_swiftshader vulkan cjson)
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 
@@ -30,6 +30,9 @@ function(cef_copy_dependencies target libPath)
             ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/snapshot_blob.bin
             ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/v8_context_snapshot.bin
             ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/vk_swiftshader_icd.json
+        # Cjson
+            ${CMAKE_CURRENT_SOURCE_DIR}/${libPath}/libcjson.so
+        # destination
             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 
         COMMAND ${CMAKE_COMMAND} -E make_directory
