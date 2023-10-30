@@ -119,8 +119,8 @@ if(CEF_CMAKE_OS_LINUX)
             ${CMAKE_CURRENT_BINARY_DIR}/wui/libs/cJSON/include
             ${CEF_OUTPUT_DIR}/include
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${CMAKE_CURRENT_BINARY_DIR}/wui/libs/cJSON/lib/libcjson.so
-            ${CEF_OUTPUT_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}/wui/libs/cJSON/lib/libcjson.so.1
+            ${CEF_OUTPUT_DIR}/libcjson.so
         )
 
 
