@@ -2,9 +2,10 @@
 
 #include <cjson/cJSON.h>
 #include <string>
+#include <functional>
 namespace wui
 {
-    typedef int (*eventListenerFunction_t)(const cJSON *eventPayload, cJSON *successRetObj, std::string &exception);
+    typedef std::function<int(const cJSON *eventPayload, cJSON *successRetObj, std::string &exception)> eventListenerFunction_t;
 
     // return values unequal 0 are considered errors, the exception and the return code get forwarded to the js binding
 
