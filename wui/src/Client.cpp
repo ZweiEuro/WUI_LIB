@@ -1,16 +1,17 @@
 #include "Client.hpp"
 #include "RenderHandler.hpp"
 #include "include/wrapper/cef_helpers.h"
-#include "MessageHandler.hpp"
+#include "messageRouter/MessageHandler.hpp"
 #include "messageRouter/messageRouterConfig.hpp"
 
 namespace wui
 {
 
-    Client::Client(void **destinationPixelBuffer, const size_t height, const size_t width)
+    Client::Client(std::shared_ptr<wui::MessageHandler> message_handler, void **destinationPixelBuffer, const size_t height, const size_t width)
 
     {
         this->render_handler_ = new RenderHandler(destinationPixelBuffer, height, width);
+        this->message_handler_ = message_handler;
     }
 
     CefRefPtr<CefRenderHandler> Client::GetRenderHandler()

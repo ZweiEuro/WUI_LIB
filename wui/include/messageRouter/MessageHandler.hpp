@@ -1,8 +1,12 @@
 #pragma once
 
-#include "Client.hpp"
-#include <algorithm>
+#include "webUiBinding.hpp"
 #include "include/wrapper/cef_helpers.h"
+#include "include/cef_client.h"
+#include "include/wrapper/cef_message_router.h"
+
+#include <map>
+#include <algorithm>
 
 namespace wui
 {
@@ -10,6 +14,12 @@ namespace wui
 
     class MessageHandler : public CefMessageRouterBrowserSide::Handler
     {
+    private:
+        std::map<std::string, eventListenerFunction_t> eventListeners_;
+
+        MessageHandler(const MessageHandler &) = delete;
+        MessageHandler &operator=(const MessageHandler &) = delete;
+
     public:
         MessageHandler() {}
 
@@ -21,8 +31,7 @@ namespace wui
                      bool persistent,
                      CefRefPtr<Callback> callback) override;
 
-    private:
-        MessageHandler(const MessageHandler &) = delete;
-        MessageHandler &operator=(const MessageHandler &) = delete;
+        bool addEventListener(const char *eventName, eventListenerFunction_t function);
+        bool removeEventListener(const char *eventName);
     };
 }

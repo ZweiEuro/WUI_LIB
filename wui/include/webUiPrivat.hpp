@@ -1,17 +1,15 @@
 
 #pragma once
 
-#include "RenderHandler.hpp"
-#include "Client.hpp"
-#include "App.hpp"
-
-#include "include/cef_browser.h"
+#include "RenderProcessHandler.hpp"
+#include "BrowserProcessHandler.hpp"
 
 namespace wui
 {
 
-    extern CefRefPtr<App> app;
+    extern CefRefPtr<RenderProcessHandler> renderProcessApp;
+    extern CefRefPtr<BrowserProcessHandler> browserProcessApp;
 
-    bool appExists();
+    bool browserProcessExists();
 
 }

@@ -1,6 +1,5 @@
 
-#include "jsBinding/V8Handler.hpp"
-
+#if 0
 namespace wui
 {
 
@@ -10,15 +9,16 @@ namespace wui
                             CefRefPtr<CefV8Value> &retval,
                             CefString &exception)
     {
-        DLOG(INFO) << "V8Handler::Execute" << name.ToString();
+        const auto functionNameAsString = name.ToString();
+        DLOG(INFO) << "V8Handler::Execute " << name.ToString();
 
         // 2 arguments, eventName (string), eventPayload (object)
-        if (name == "sendEvent")
+        if (functionNameAsString.compare("sendEvent") == 0)
         {
             // arg check
             if (arguments.size() != 2 || !arguments[0]->IsString() || !arguments[1]->IsObject())
             {
-                exception = "Invalid arguments";
+                exception = "Invalid arguments " + arguments[0]->GetStringValue().ToString();
                 return true;
             }
 
@@ -27,7 +27,14 @@ namespace wui
             auto eventListener = eventListeners_.find(eventName);
             if (eventListener == eventListeners_.end())
             {
+
                 exception = "Event listener does not exist, event swallowed";
+                DLOG(INFO) << "V8Handler::Execute: event listener not found, swallowing event, list size: " << eventListeners_.size() << "in handler" << this;
+                for (auto const &x : eventListeners_)
+                {
+                    DLOG(INFO) << "V8Handler::Execute: event listener registered: " << x.first;
+                }
+
                 return true;
             }
             else
@@ -65,7 +72,7 @@ namespace wui
             }
         }
 
-        if (name == "registerEventListener")
+        if (functionNameAsString.compare("registerEventListener") == 0)
         {
             retval = CefV8Value::CreateString("My Value!");
             return true;
@@ -82,6 +89,8 @@ namespace wui
             DLOG(WARNING) << "addEventListener: event listener already exists, unregister it first";
             return false;
         }
+
+        DLOG(INFO) << "Registered event listener for " << eventName << " to " << this;
 
         eventListeners_[eventName] = function;
         return true;
@@ -100,3 +109,5 @@ namespace wui
     }
 
 }
+
+#endif

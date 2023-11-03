@@ -8,7 +8,7 @@ namespace wui
                                 int clickCount, bool force)
     {
 
-        if (app.get() == nullptr)
+        if (browserProcessApp.get() == nullptr)
         {
             DLOG(INFO) << "App is nullptr";
             return false;
@@ -21,8 +21,8 @@ namespace wui
         //            << " MouseUp: " << mouseUp
         //            << " ClickCount: " << clickCount;
 
-        if (force == false && app->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->coordinateEmpty(event.x,
-                                                                                                                      event.y))
+        if (force == false && browserProcessApp->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->coordinateEmpty(event.x,
+                                                                                                                                    event.y))
         {
             DLOG(INFO) << "Coordinate Empty";
             return false;
@@ -34,14 +34,14 @@ namespace wui
             .modifiers = event.modifiers,
         };
 
-        app->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->SendMouseClickEvent(CefMouseEvent(cefEvent), (CefBrowserHost::MouseButtonType)type, mouseUp, clickCount);
+        browserProcessApp->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->SendMouseClickEvent(CefMouseEvent(cefEvent), (CefBrowserHost::MouseButtonType)type, mouseUp, clickCount);
         return true;
     }
 
     void CEFSendMouseMoveEvent(const wui_mouse_event_t &event, bool mouseLeave)
     {
 
-        if (app.get() == nullptr)
+        if (browserProcessApp.get() == nullptr)
         {
             DLOG(INFO) << "App is nullptr";
             return;
@@ -57,12 +57,12 @@ namespace wui
             .modifiers = event.modifiers,
         };
 
-        app->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->SendMouseMoveEvent(CefMouseEvent(cefEvent), mouseLeave);
+        browserProcessApp->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->SendMouseMoveEvent(CefMouseEvent(cefEvent), mouseLeave);
     }
 
     bool CEFSendMouseWheelEvent(const wui_mouse_event_t &event, int deltaX, int deltaY, bool force)
     {
-        if (app.get() == nullptr)
+        if (browserProcessApp.get() == nullptr)
         {
             DLOG(INFO) << "App is nullptr";
             return false;
@@ -74,8 +74,8 @@ namespace wui
         //            << " DeltaX: " << deltaX
         //            << " DeltaY: " << deltaY;
 
-        if (force == false && app->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->coordinateEmpty(event.x,
-                                                                                                                      event.y))
+        if (force == false && browserProcessApp->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->coordinateEmpty(event.x,
+                                                                                                                                    event.y))
         {
             DLOG(INFO) << "Coordinate Empty";
             return false;
@@ -87,13 +87,13 @@ namespace wui
             .modifiers = event.modifiers,
         };
 
-        app->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->SendMouseWheelEvent(CefMouseEvent(cefEvent), deltaX, deltaY);
+        browserProcessApp->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->SendMouseWheelEvent(CefMouseEvent(cefEvent), deltaX, deltaY);
         return true;
     }
 
     void CEFSendKeyEvent(const wui_key_event_t &event)
     {
-        if (app.get() == nullptr)
+        if (browserProcessApp.get() == nullptr)
         {
             DLOG(INFO) << "App is nullptr";
             return;
@@ -117,6 +117,6 @@ namespace wui
             .focus_on_editable_field = event.focus_on_editable_field,
         };
 
-        app->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->SendKeyEvent(CefKeyEvent(cefEvent));
+        browserProcessApp->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->SendKeyEvent(CefKeyEvent(cefEvent));
     }
 }

@@ -1,28 +1,27 @@
 
-#include "webUiJsBindings.hpp"
+#include "webUiBinding.hpp"
 #include "webUiPrivat.hpp"
 namespace wui
 {
     bool registerEventListener(const char *eventName, eventListenerFunction_t function)
     {
-        if (!appExists())
+        if (!browserProcessExists())
         {
             DLOG(WARNING) << "registerEventListener: app does not exist";
             return false;
         }
 
-        return app->GetWUIRenderProcessHandler()->addEventListener(eventName, function);
+        return browserProcessApp->addEventListener(eventName, function);
     }
 
     bool unregisterEventListener(const char *eventName)
     {
-        if (!appExists())
+        if (!browserProcessExists())
         {
             DLOG(WARNING) << "unregisterEventListener: app does not exist";
             return false;
         }
-
-        return app->GetWUIRenderProcessHandler()->removeEventListener(eventName);
+        return browserProcessApp->removeEventListener(eventName);
     }
 
 }

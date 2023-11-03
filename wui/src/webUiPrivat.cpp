@@ -2,11 +2,13 @@
 
 namespace wui
 {
-    CefRefPtr<wui::App> app;
 
-    bool appExists()
+    CefRefPtr<RenderProcessHandler> renderProcessApp = nullptr;
+    CefRefPtr<BrowserProcessHandler> browserProcessApp = nullptr;
+
+    bool browserProcessExists()
     {
-        return app.get() != nullptr;
+        return browserProcessApp.get() != nullptr;
     }
 
 }

@@ -7,6 +7,21 @@
 namespace wui
 {
 
+    void BrowserProcessHandler::OnBeforeCommandLineProcessing(
+        const CefString &process_type,
+        CefRefPtr<CefCommandLine> command_line)
+    {
+        // Command-line flags can be modified in this callback.
+        // |process_type| is empty for the browser process.
+        if (process_type.empty())
+        {
+#if defined(OS_MACOSX)
+            // Disable the macOS keychain prompt. Cookies will not be encrypted.
+            command_line->AppendSwitch("use-mock-keychain");
+#endif
+        }
+    }
+
     void BrowserProcessHandler::setClientViewParams(void **pixelBuffer, const size_t initialHeight, const size_t initialWidth, std::string path)
     {
         this->client_para_pixelBuffer_ = pixelBuffer;
@@ -21,9 +36,11 @@ namespace wui
 
         // create the client
 
-        this->client_ = new Client(client_para_pixelBuffer_,
-                                   client_para_initialHeight,
-                                   client_para_initialWidth);
+        this->client_ = new Client(
+            message_handler_,
+            client_para_pixelBuffer_,
+            client_para_initialHeight,
+            client_para_initialWidth);
 
         // initial setup
 
@@ -61,4 +78,25 @@ namespace wui
 
     CefRefPtr<Client> BrowserProcessHandler::GetClient() { return this->client_; }
     CefRefPtr<CefBrowser> BrowserProcessHandler::GetBrowser() { return this->browser_; }
+
+    CefRefPtr<CefBrowserProcessHandler> BrowserProcessHandler::GetBrowserProcessHandler()
+    {
+        return this;
+    }
+
+    CefRefPtr<BrowserProcessHandler> BrowserProcessHandler::GetWUIBrowserProcessHandler()
+    {
+        return this;
+    }
+
+    bool BrowserProcessHandler::addEventListener(const char *eventName, eventListenerFunction_t function)
+    {
+        return this->message_handler_->addEventListener(eventName, function);
+    }
+
+    bool BrowserProcessHandler::removeEventListener(const char *eventName)
+    {
+        return this->message_handler_->removeEventListener(eventName);
+    }
+
 }

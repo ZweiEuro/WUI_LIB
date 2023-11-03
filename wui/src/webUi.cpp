@@ -3,36 +3,73 @@
 #include "RenderHandler.hpp"
 #include "Client.hpp"
 #include "webUiPrivat.hpp"
-#include "App.hpp"
 
 #include "include/cef_browser.h"
+#include "cefUtil.hpp"
 
 namespace wui
 {
 
     CefMainArgs args;
 
+    /**
+     * Dev Notes:
+     * separate the processes maybe? https://bitbucket.org/chromiumembedded/cef/wiki/GeneralUsage.md#markdown-header-processes
+     * search "Application Structure"
+     * (separate processes would enable mac support... i think)
+     * */
+
     bool CEFInit(int argc, char **argv)
     {
 
-        if (app.get() != nullptr)
+        if (browserProcessExists())
         {
             DLOG(ERROR) << "Web UI already initialized";
             return false;
         }
 
         args = CefMainArgs(argc, argv);
+        auto commandLine = CreateCommandLine(args);
 
-        app = new wui::App();
+        CefRefPtr<CefApp> app = nullptr;
 
-        int pid = CefExecuteProcess(args, app, nullptr);
+        switch (GetProcessType(commandLine))
+        {
+        case PROCESS_TYPE_BROWSER:
+            DLOG(INFO) << "Initializing Web UI browser process " << GetProcessType(commandLine);
+            browserProcessApp = new BrowserProcessHandler();
+            app = browserProcessApp;
+            break;
+        case PROCESS_TYPE_RENDERER:
+            DLOG(INFO) << "Initializing Web UI renderer process " << GetProcessType(commandLine);
+            renderProcessApp = new RenderProcessHandler();
+            app = renderProcessApp;
+            break;
+        case PROCESS_TYPE_LINUX_ZYGOTE:
+            DLOG(INFO) << "Initializing Web UI linux zygote process " << GetProcessType(commandLine);
+            app = new RenderProcessHandler();
+            break;
+        case PROCESS_TYPE_OTHER:
+            DLOG(INFO) << "Initializing Web UI other process " << GetProcessType(commandLine);
+            app = new RenderProcessHandler();
+            break;
+
+        default:
+            break;
+        }
+
+        int exit_code = CefExecuteProcess(args, app.get(), nullptr);
 
         // checkout CefApp, derive it and set it as second parameter, for more control on
         // command args and resources.
-        if (pid >= 0)
+        if (exit_code >= 0)
         {
             // child process has nothin more to do
-            exit(pid);
+            exit(exit_code);
+        }
+        else
+        {
+            DLOG(INFO) << "Web UI initialized " << exit_code << " (-1 is good)";
         }
 
         return true;
@@ -42,7 +79,7 @@ namespace wui
     {
         DLOG(INFO) << "Starting Web UI";
 
-        app->GetWUIBrowserProcessHandler()->setClientViewParams(pixelBuffer, initialHeight, initialWidth, path);
+        browserProcessApp->GetWUIBrowserProcessHandler()->setClientViewParams(pixelBuffer, initialHeight, initialWidth, path);
 
         CefSettings settings;
 
@@ -65,7 +102,7 @@ namespace wui
 
         // init custom scheme for local files
 
-        bool init_res = CefInitialize(args, settings, app, nullptr);
+        bool init_res = CefInitialize(args, settings, browserProcessApp.get(), nullptr);
 
         // CefInitialize creates a sub-proccess and executes the same executeable, as calling CefInitialize, if not set different in settings.browser_subprocess_path
         // if you create an extra program just for the childproccess you only have to call CefExecuteProcess(...) in it.
@@ -93,9 +130,9 @@ namespace wui
     void resizeUi(const size_t newWidth, const size_t newHeight, void **newDestinationPixelBuffer)
     {
 
-        if (app->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->resize(newWidth, newHeight, newDestinationPixelBuffer))
+        if (browserProcessApp->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->resize(newWidth, newHeight, newDestinationPixelBuffer))
         {
-            app->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->WasResized();
+            browserProcessApp->GetWUIBrowserProcessHandler()->GetBrowser()->GetHost()->WasResized();
         }
     }
 
