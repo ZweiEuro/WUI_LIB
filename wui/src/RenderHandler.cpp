@@ -71,7 +71,7 @@ namespace wui
         memcpy(currentlyDrawTargetBuffer, currentlyViewedBuffer, pixelBufferSize);
 
         // check if its the entire thing
-        if (dirtyRects.size() == 1 && dirtyRects[0].height == height && dirtyRects[0].width == width)
+        if (true || (dirtyRects.size() == 1 && dirtyRects[0].height == height && dirtyRects[0].width == width))
         {
             memcpy(currentlyDrawTargetBuffer, buffer, pixelBufferSize);
         }
