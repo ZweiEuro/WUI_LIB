@@ -3,16 +3,22 @@
 namespace wui
 {
 
-    bool MessageHandler::OnQuery(CefRefPtr<CefBrowser> browser,
-                                 CefRefPtr<CefFrame> frame,
-                                 int64_t query_id,
-                                 const CefString &request,
-                                 bool persistent,
-                                 CefRefPtr<Callback> callback)
+    bool SingleEventMessageHandler::OnQuery(CefRefPtr<CefBrowser> browser,
+                                            CefRefPtr<CefFrame> frame,
+                                            int64_t query_id,
+                                            const CefString &request,
+                                            bool persistent,
+                                            CefRefPtr<Callback> callback)
     {
         if (frame->GetURL().ToString().rfind("file://", 0) != 0)
         {
             DLOG(WARNING) << "got query" << request.ToString() << " origin " << frame->GetURL().ToString() << " but not from file://";
+            return false;
+        }
+
+        if (persistent)
+        {
+            // persistent queries are not handled by this handler
             return false;
         }
 
@@ -75,7 +81,7 @@ namespace wui
         return true;
     }
 
-    bool MessageHandler::addEventListener(const char *eventName, eventListenerFunction_t function)
+    bool SingleEventMessageHandler::addEventListener(const char *eventName, eventListenerFunction_t function)
     {
         if (eventListeners_.find(eventName) != eventListeners_.end())
         {
@@ -89,7 +95,7 @@ namespace wui
         return true;
     }
 
-    bool MessageHandler::removeEventListener(const char *eventName)
+    bool SingleEventMessageHandler::removeEventListener(const char *eventName)
     {
         if (eventListeners_.find(eventName) == eventListeners_.end())
         {

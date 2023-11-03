@@ -2,6 +2,7 @@
 
 namespace wui
 {
+
     CefMessageRouterConfig getMessageRouterConfig()
     {
         CefMessageRouterConfig config;

@@ -4,6 +4,7 @@
 #include "include/cef_client.h"
 #include "include/wrapper/cef_message_router.h"
 #include "messageRouter/MessageHandler.hpp"
+#include "messageRouter/MessageHandlers.hpp"
 
 namespace wui
 {
@@ -16,7 +17,7 @@ namespace wui
         CefRefPtr<RenderHandler> render_handler_;
 
         CefRefPtr<CefMessageRouterBrowserSide> message_router_;
-        std::shared_ptr<wui::MessageHandler> message_handler_;
+        std::shared_ptr<MessageHandlers> message_handlers_;
 
         // Track the number of browsers using this Client.
         int browser_ct_;
@@ -24,7 +25,7 @@ namespace wui
         IMPLEMENT_REFCOUNTING(Client);
 
     public:
-        Client(std::shared_ptr<wui::MessageHandler> message_handler, void **destinationPixelBuffer, const size_t height, const size_t width);
+        Client(std::shared_ptr<MessageHandlers> message_handler, void **destinationPixelBuffer, const size_t height, const size_t width);
 
         CefRefPtr<CefRenderHandler> GetRenderHandler() override;
         CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }

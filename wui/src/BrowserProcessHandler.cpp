@@ -37,7 +37,7 @@ namespace wui
         // create the client
 
         this->client_ = new Client(
-            message_handler_,
+            message_handlers_,
             client_para_pixelBuffer_,
             client_para_initialHeight,
             client_para_initialWidth);
@@ -91,12 +91,12 @@ namespace wui
 
     bool BrowserProcessHandler::addEventListener(const char *eventName, eventListenerFunction_t function)
     {
-        return this->message_handler_->addEventListener(eventName, function);
+        return this->message_handlers_->single_event_message_handler->addEventListener(eventName, function);
     }
 
     bool BrowserProcessHandler::removeEventListener(const char *eventName)
     {
-        return this->message_handler_->removeEventListener(eventName);
+        return this->message_handlers_->single_event_message_handler->removeEventListener(eventName);
     }
 
 }

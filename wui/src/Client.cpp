@@ -7,11 +7,11 @@
 namespace wui
 {
 
-    Client::Client(std::shared_ptr<wui::MessageHandler> message_handler, void **destinationPixelBuffer, const size_t height, const size_t width)
+    Client::Client(std::shared_ptr<MessageHandlers> message_handler, void **destinationPixelBuffer, const size_t height, const size_t width)
 
     {
         this->render_handler_ = new RenderHandler(destinationPixelBuffer, height, width);
-        this->message_handler_ = message_handler;
+        this->message_handlers_ = message_handler;
     }
 
     CefRefPtr<CefRenderHandler> Client::GetRenderHandler()
@@ -46,7 +46,7 @@ namespace wui
             message_router_ = CefMessageRouterBrowserSide::Create(getMessageRouterConfig());
 
             // Register handlers with the router.
-            message_router_->AddHandler(message_handler_.get(), false);
+            message_router_->AddHandler(message_handlers_->single_event_message_handler.get(), false);
         }
 
         browser_ct_++;
@@ -62,8 +62,8 @@ namespace wui
             DLOG(INFO) << "Destroying message router";
 
             // Free the router when the last browser is closed.
-            message_router_->RemoveHandler(message_handler_.get());
-            message_handler_.reset();
+            message_router_->RemoveHandler(message_handlers_->single_event_message_handler.get());
+            message_handlers_.reset();
             message_router_ = nullptr;
         }
     }

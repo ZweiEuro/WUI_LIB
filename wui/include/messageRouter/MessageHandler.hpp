@@ -2,7 +2,6 @@
 
 #include "webUiBinding.hpp"
 #include "include/wrapper/cef_helpers.h"
-#include "include/cef_client.h"
 #include "include/wrapper/cef_message_router.h"
 
 #include <map>
@@ -10,18 +9,17 @@
 
 namespace wui
 {
-    const char kTestMessageName[] = "MessageRouterTest";
 
-    class MessageHandler : public CefMessageRouterBrowserSide::Handler
+    class SingleEventMessageHandler : public CefMessageRouterBrowserSide::Handler
     {
     private:
         std::map<std::string, eventListenerFunction_t> eventListeners_;
 
-        MessageHandler(const MessageHandler &) = delete;
-        MessageHandler &operator=(const MessageHandler &) = delete;
+        SingleEventMessageHandler(const SingleEventMessageHandler &) = delete;
+        SingleEventMessageHandler &operator=(const SingleEventMessageHandler &) = delete;
 
     public:
-        MessageHandler() {}
+        SingleEventMessageHandler() {}
 
         // Called due to cefQuery execution in message_router.html.
         bool OnQuery(CefRefPtr<CefBrowser> browser,

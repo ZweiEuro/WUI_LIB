@@ -1,6 +1,7 @@
 #pragma once
 #include "Client.hpp"
 #include "webUiBinding.hpp"
+#include "messageRouter/MessageHandlers.hpp"
 
 namespace wui
 {
@@ -23,7 +24,8 @@ namespace wui
 
         // Query handler
 
-        std::shared_ptr<wui::MessageHandler> message_handler_ = std::make_shared<MessageHandler>(); // used by the router inside client
+        std::shared_ptr<MessageHandlers> message_handlers_ =
+            std::make_shared<MessageHandlers>(); // used by the router inside client
 
         // CEF ref
         IMPLEMENT_REFCOUNTING(BrowserProcessHandler);
@@ -32,7 +34,12 @@ namespace wui
         BrowserProcessHandler &operator=(const BrowserProcessHandler &) = delete;
 
     public:
-        BrowserProcessHandler() {}
+        BrowserProcessHandler()
+        {
+
+            // Initialize single event message handler
+            message_handlers_->single_event_message_handler = std::make_shared<SingleEventMessageHandler>();
+        }
 
         void OnBeforeCommandLineProcessing(
             const CefString &process_type,
