@@ -10,19 +10,69 @@ namespace wui
                                  bool persistent,
                                  CefRefPtr<Callback> callback)
     {
+        if (frame->GetURL().ToString().rfind("file://", 0) != 0)
+        {
+            DLOG(WARNING) << "got query" << request.ToString() << " origin " << frame->GetURL().ToString() << " but not from file://";
+            return false;
+        }
+
         DLOG(INFO) << "got query" << request.ToString() << " origin " << frame->GetURL().ToString();
 
-        const std::string &message_name = request;
-        if (message_name.find(kTestMessageName) == 0)
+        auto cjson = cJSON_Parse(request.ToString().c_str());
+
+        // check if all necessary properties exist
+
+        if (cjson == nullptr)
         {
-            // Reverse the string and return.
-            std::string result = message_name.substr(sizeof(kTestMessageName));
-            std::reverse(result.begin(), result.end());
-            callback->Success(result);
+            DLOG(WARNING) << "got invalid json";
+            callback->Failure(-100, "invalid json");
             return true;
         }
 
-        return false;
+        auto wuiEventName = cJSON_GetObjectItem(cjson, "wuiEventName");
+        auto wuiEventPayload = cJSON_GetObjectItem(cjson, "wuiEventPayload");
+
+        if (wuiEventName == nullptr || wuiEventPayload == nullptr)
+        {
+            DLOG(WARNING) << "got json without wuiEventName or wuiEventPayload";
+            callback->Failure(-100, "invalid json");
+            cJSON_Delete(cjson);
+            return true;
+        }
+
+        // Ok now find the handler and process it
+        cJSON *successObject = cJSON_CreateObject();
+        std::string exceptionStr;
+        int retVal = 0;
+
+        auto eventListener = eventListeners_.find(wuiEventName->valuestring);
+        if (eventListener == eventListeners_.end())
+        {
+            DLOG(INFO) << "No Event listener for queried event " << wuiEventName->valuestring;
+            DLOG(INFO) << "got " << eventListeners_.size() << " event listeners in handler " << this;
+            callback->Failure(-101, "No listener registered for event" + std::string(wuiEventName->valuestring));
+            goto cleanupCefQuery;
+        }
+
+        retVal = eventListener->second(wuiEventPayload, successObject, exceptionStr);
+
+        if (retVal != 0)
+        {
+            callback->Failure(retVal, exceptionStr);
+            goto cleanupCefQuery;
+        }
+        else
+        {
+            auto printed = cJSON_Print(successObject);
+            callback->Success(printed);
+            free(printed);
+            goto cleanupCefQuery;
+        }
+
+    cleanupCefQuery:
+        cJSON_Delete(cjson);
+        cJSON_Delete(successObject);
+        return true;
     }
 
     bool MessageHandler::addEventListener(const char *eventName, eventListenerFunction_t function)

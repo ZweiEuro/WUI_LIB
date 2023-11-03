@@ -46,7 +46,6 @@ namespace wui
             message_router_ = CefMessageRouterBrowserSide::Create(getMessageRouterConfig());
 
             // Register handlers with the router.
-            message_handler_.reset(new wui::MessageHandler());
             message_router_->AddHandler(message_handler_.get(), false);
         }
 
