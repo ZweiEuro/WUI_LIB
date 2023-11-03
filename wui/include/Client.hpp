@@ -3,7 +3,7 @@
 #include "RenderHandler.hpp"
 #include "include/cef_client.h"
 #include "include/wrapper/cef_message_router.h"
-#include "messageRouter/MessageHandler.hpp"
+#include "messageRouter/SingleEventMessageHandler.hpp"
 #include "messageRouter/MessageHandlers.hpp"
 
 namespace wui

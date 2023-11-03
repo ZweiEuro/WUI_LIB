@@ -1,7 +1,7 @@
 #include "Client.hpp"
 #include "RenderHandler.hpp"
 #include "include/wrapper/cef_helpers.h"
-#include "messageRouter/MessageHandler.hpp"
+#include "messageRouter/SingleEventMessageHandler.hpp"
 #include "messageRouter/messageRouterConfig.hpp"
 
 namespace wui
@@ -46,6 +46,7 @@ namespace wui
             message_router_ = CefMessageRouterBrowserSide::Create(getMessageRouterConfig());
 
             // Register handlers with the router.
+            message_router_->AddHandler(message_handlers_->persistent_callback_message_handler.get(), false);
             message_router_->AddHandler(message_handlers_->single_event_message_handler.get(), false);
         }
 
@@ -63,7 +64,7 @@ namespace wui
 
             // Free the router when the last browser is closed.
             message_router_->RemoveHandler(message_handlers_->single_event_message_handler.get());
-            message_handlers_.reset();
+            message_router_->RemoveHandler(message_handlers_->persistent_callback_message_handler.get());
             message_router_ = nullptr;
         }
     }

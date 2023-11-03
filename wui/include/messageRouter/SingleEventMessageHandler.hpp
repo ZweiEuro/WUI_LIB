@@ -13,7 +13,7 @@ namespace wui
     class SingleEventMessageHandler : public CefMessageRouterBrowserSide::Handler
     {
     private:
-        std::map<std::string, eventListenerFunction_t> eventListeners_;
+        std::map<std::string, eventListenerFunction_t> wui_single_event_listeners_;
 
         SingleEventMessageHandler(const SingleEventMessageHandler &) = delete;
         SingleEventMessageHandler &operator=(const SingleEventMessageHandler &) = delete;

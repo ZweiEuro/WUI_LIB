@@ -39,6 +39,7 @@ namespace wui
 
             // Initialize single event message handler
             message_handlers_->single_event_message_handler = std::make_shared<SingleEventMessageHandler>();
+            message_handlers_->persistent_callback_message_handler = std::make_shared<PersistentCallbackMessageHandler>();
         }
 
         void OnBeforeCommandLineProcessing(
@@ -60,5 +61,7 @@ namespace wui
 
         bool addEventListener(const char *eventName, eventListenerFunction_t function);
         bool removeEventListener(const char *eventName);
+
+        bool sendEvent(const char *eventName, const cJSON *eventPayload);
     };
 }

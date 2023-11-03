@@ -99,4 +99,9 @@ namespace wui
         return this->message_handlers_->single_event_message_handler->removeEventListener(eventName);
     }
 
+    bool BrowserProcessHandler::sendEvent(const char *eventName, const cJSON *eventPayload)
+    {
+        return this->message_handlers_->persistent_callback_message_handler->sendEvent(eventName, eventPayload);
+    }
+
 }

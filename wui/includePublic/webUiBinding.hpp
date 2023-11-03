@@ -10,4 +10,6 @@ namespace wui
 
     bool registerEventListener(const char *eventName, eventListenerFunction_t function);
     bool unregisterEventListener(const char *eventName);
+
+    bool sendEvent(const char *eventName, const cJSON *eventPayload);
 }

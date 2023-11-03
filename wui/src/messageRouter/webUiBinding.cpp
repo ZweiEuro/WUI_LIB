@@ -24,4 +24,15 @@ namespace wui
         return browserProcessApp->removeEventListener(eventName);
     }
 
+    bool sendEvent(const char *eventName, const cJSON *eventPayload)
+    {
+        if (!browserProcessExists())
+        {
+            DLOG(WARNING) << "sendEvent: app does not exist";
+            return false;
+        }
+
+        return browserProcessApp->sendEvent(eventName, eventPayload);
+    }
+
 }

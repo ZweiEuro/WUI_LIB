@@ -1,4 +1,4 @@
-#include "messageRouter/MessageHandler.hpp"
+#include "messageRouter/SingleEventMessageHandler.hpp"
 
 namespace wui
 {
@@ -51,11 +51,11 @@ namespace wui
         std::string exceptionStr;
         int retVal = 0;
 
-        auto eventListener = eventListeners_.find(wuiEventName->valuestring);
-        if (eventListener == eventListeners_.end())
+        auto eventListener = wui_single_event_listeners_.find(wuiEventName->valuestring);
+        if (eventListener == wui_single_event_listeners_.end())
         {
             DLOG(INFO) << "No Event listener for queried event " << wuiEventName->valuestring;
-            DLOG(INFO) << "got " << eventListeners_.size() << " event listeners in handler " << this;
+            DLOG(INFO) << "got " << wui_single_event_listeners_.size() << " event listeners in handler " << this;
             callback->Failure(-101, "No listener registered for event" + std::string(wuiEventName->valuestring));
             goto cleanupCefQuery;
         }
@@ -83,7 +83,7 @@ namespace wui
 
     bool SingleEventMessageHandler::addEventListener(const char *eventName, eventListenerFunction_t function)
     {
-        if (eventListeners_.find(eventName) != eventListeners_.end())
+        if (wui_single_event_listeners_.find(eventName) != wui_single_event_listeners_.end())
         {
             DLOG(WARNING) << "addEventListener: event listener already exists, unregister it first";
             return false;
@@ -91,19 +91,19 @@ namespace wui
 
         DLOG(INFO) << "Registered event listener for " << eventName << " to " << this;
 
-        eventListeners_[eventName] = function;
+        wui_single_event_listeners_[eventName] = function;
         return true;
     }
 
     bool SingleEventMessageHandler::removeEventListener(const char *eventName)
     {
-        if (eventListeners_.find(eventName) == eventListeners_.end())
+        if (wui_single_event_listeners_.find(eventName) == wui_single_event_listeners_.end())
         {
             DLOG(WARNING) << "removeEventListener: event listener does not exist";
             return false;
         }
 
-        eventListeners_.erase(eventName);
+        wui_single_event_listeners_.erase(eventName);
         return true;
     }
 
