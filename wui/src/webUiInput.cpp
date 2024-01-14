@@ -14,12 +14,12 @@ namespace wui
             return false;
         }
 
-        DLOG(INFO) << "Send Mouse Click Event: "
-                   << " X: " << event.x
-                   << " Y: " << event.y
-                   << " Type: " << type
-                   << " MouseUp: " << mouseUp
-                   << " ClickCount: " << clickCount;
+        /*  DLOG(INFO) << "Send Mouse Click Event: "
+                    << " X: " << event.x
+                    << " Y: " << event.y
+                    << " Type: " << type
+                    << " MouseUp: " << mouseUp
+                    << " ClickCount: " << clickCount; */
 
         if (force == false && browserProcessApp->GetWUIBrowserProcessHandler()->GetClient()->GetWUIRenderHandler()->coordinateEmpty(event.x,
                                                                                                                                     event.y))
